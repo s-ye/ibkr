@@ -19,6 +19,19 @@ data = util.df(bars)
 bollinger_params = {'period': 20, 'std_dev': 1.5}
 strategy = BollingerBandsStrategy(stock, data, ib, params=bollinger_params, profit_target_pct=0.1, trailing_stop_pct=0.03)
 
+
+
+def connect_ib():
+    """Connect to IBKR and handle connection errors."""
+    if not ib.isConnected():
+        try:
+            ib.connect('127.0.0.1', 7497, clientId=1)
+            print("Connected to IBKR.")
+        except Exception as e:
+            print(f"Connection error: {e}. Retrying in 10 seconds...")
+            time.sleep(10)
+            connect_ib()  # Retry connection
+
 # Function to update data and run paper trading
 def update_data_and_trade():
     print("Fetching latest data...")
@@ -40,12 +53,21 @@ def update_data_and_trade():
     strategy.run_paper_trading()  # Run paper trading based on the latest signals
     print("Update complete.")
 
-# Run in a loop to check for signals every 15 minutes
-try:
+# Main loop to check for signals every 15 minutes
+def run_bot_continuously():
+    connect_ib()  # Ensure initial connection
     while True:
-        update_data_and_trade()
-        time.sleep(900) # Sleep for 15 minutes
+        try:
+            update_data_and_trade()
+            time.sleep(15 * 60)  # Wait 15 minutes
+        except Exception as e:
+            print(f"Error encountered: {e}. Reconnecting in 30 seconds...")
+            time.sleep(30)
+            connect_ib()  # Attempt to reconnect if there’s an error
 
+# Run the bot
+try:
+    run_bot_continuously()
 except KeyboardInterrupt:
     ib.disconnect()
     print("Disconnected from IBKR.")
