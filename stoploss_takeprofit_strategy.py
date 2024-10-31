@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from base_strategy import BaseStrategy
 import logging
 import os
+from ib_insync import MarketOrder
+
 
 class StopLossTakeProfitStrategy(BaseStrategy):
     def __init__(self, stock, data, ib, params=None, initial_capital=1_000_000, position_size_pct=0.02, profit_target_pct=0.05, trailing_stop_pct=0.03):
@@ -140,6 +142,26 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         self.entry_date = None
         self.highest_price_since_entry = 0
 
+    def paper_trade_buy(self, current_price):
+        shares_to_buy = (self.current_balance * self.position_size_pct) / current_price
+        if shares_to_buy > 0 and shares_to_buy * current_price <= self.current_balance:
+            order = MarketOrder('BUY', shares_to_buy)
+            trade = self.ib.placeOrder(self.contract, order)
+            logging.info(f"Paper trade BUY order for {shares_to_buy:.2f} shares at {current_price} placed.")
+            return trade
+        logging.warning("Insufficient balance for buy order.")
+        return None
+
+    # Paper trading method to place a live sell order
+    def paper_trade_sell(self, current_price):
+        if self.current_position > 0:
+            order = MarketOrder('SELL', self.current_position)
+            trade = self.ib.placeOrder(self.contract, order)
+            logging.info(f"Paper trade SELL order for {self.current_position:.2f} shares at {current_price} placed.")
+            return trade
+        logging.warning("No position to sell.")
+        return None
+
     def _hit_profit_target(self, current_price):
         """Check if the profit target is met."""
         return (current_price - self.avg_entry_price) / self.avg_entry_price >= self.profit_target_pct
@@ -173,3 +195,15 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         # Log the starting conditions
         self.logger.info(f"Starting {self.__class__.__name__} with initial capital: {self.initial_capital}")
         self.logger.info(f"Hyperparameters: {self.params}")
+
+    def run_paper_trading(self):
+        """Run paper trading by checking signals and placing orders."""
+        latest_price = self.data['close'].iloc[-1]
+
+        # Check buy signal and place paper trade if signal changes to 1
+        if self.data['signal'].iloc[-1] == 1 and self.data['signal'].iloc[-2] != 1:
+            self.paper_trade_buy(latest_price)
+
+        # Check sell signal and place paper trade if signal changes to -1
+        elif self.data['signal'].iloc[-1] == -1 and self.data['signal'].iloc[-2] == 1:
+            self.paper_trade_sell(latest_price)
