@@ -1,2 +1,2 @@
-2024-10-30 22:39:46,756 - Starting BollingerBandsStrategy with initial capital: 1000000
-2024-10-30 22:39:46,756 - Hyperparameters: {'period': 20, 'std_dev': 1.5}
+2024-10-30 23:15:05,706 - Starting BollingerBandsStrategy with initial capital: 1000000
+2024-10-30 23:15:05,706 - Hyperparameters: {'period': 20, 'std_dev': 1.5}

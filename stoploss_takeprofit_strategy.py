@@ -5,6 +5,7 @@ from base_strategy import BaseStrategy
 import logging
 import os
 from ib_insync import MarketOrder
+import pandas as pd
 
 
 class StopLossTakeProfitStrategy(BaseStrategy):
@@ -207,3 +208,22 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         # Check sell signal and place paper trade if signal changes to -1
         elif self.data['signal'].iloc[-1] == -1 and self.data['signal'].iloc[-2] == 1:
             self.paper_trade_sell(latest_price)
+
+    # support second-by-second updates
+    def update_with_price(self, current_price, current_time):
+        """Update strategy with a single price point and check for signals."""
+        
+        # Append the new price to the existing data (in-memory)
+        latest_data = pd.DataFrame({
+            'date': [current_time],
+            'close': [current_price]
+        }).set_index('date')
+        
+        # Concatenate the new price to the main data (dropping duplicates)
+        self.data = pd.concat([self.data, latest_data]).drop_duplicates(keep='last')
+
+        # Generate signals based on updated data
+        self.data_with_signals = self.generate_signals()
+
+        # Run paper trading based on the latest signals
+        self.run_paper_trading()

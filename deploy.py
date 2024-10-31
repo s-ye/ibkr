@@ -3,6 +3,8 @@ from strategies import BollingerBandsStrategy
 import time
 import pandas as pd
 
+
+
 # Connect to IBKR paper trading account
 ib = IB()
 ib.connect('127.0.0.1', 7497, clientId=1)
@@ -45,6 +47,8 @@ def update_data_and_trade():
     )
     latest_data = util.df(latest_bars)
     strategy.data = pd.concat([strategy.data, latest_data]).drop_duplicates(subset=['date'])
+    # show the latest data
+    print(strategy.data.tail())
     
     print("Generating signals...")
     strategy.data_with_signals = strategy.generate_signals()
@@ -59,7 +63,7 @@ def run_bot_continuously():
     while True:
         try:
             update_data_and_trade()
-            time.sleep(15 * 60)  # Wait 15 minutes
+            time.sleep(900)  # Wait for 15 minutes before checking for new signals
         except Exception as e:
             print(f"Error encountered: {e}. Reconnecting in 30 seconds...")
             time.sleep(30)
