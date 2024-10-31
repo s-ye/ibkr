@@ -1,5 +1,6 @@
-2024-10-31 11:39:36,475 - Starting BollingerBandsStrategy with initial capital: 3136457.59
-2024-10-31 11:39:36,475 - Hyperparameters: {'period': 20, 'std_dev': 1.5, 'profit_target_pct': 0.05, 'trailing_stop_pct': 0.03}
-2024-10-31 11:39:36,497 - Warning: entry_date is None when calculating duration in _sell_position.
-2024-10-31 11:39:36,498 - Paper trade SELL order for 554.00 shares at 227.16 placed.profit_take
-2024-10-31 11:39:36,498 - Current portfolio value: 3262304.23
+2024-10-31 13:47:22,929 - Starting BollingerBandsStrategy with initial capital: 3136591.88
+2024-10-31 13:47:22,929 - Hyperparameters: {'period': 20, 'std_dev': 1.5, 'profit_target_pct': 0.05, 'trailing_stop_pct': 0.03}
+2024-10-31 13:47:22,982 - Warning: entry_date is None when calculating duration in _sell_position.
+2024-10-31 13:47:22,983 - Paper trade SELL order for 553.00 shares at 227.2 placed.profit_take
+2024-10-31 13:47:22,983 - Current portfolio value: 3262233.48
+2024-10-31 13:47:22,983 - Buy executed - Entry Date: None, Exit Date: 2024-10-31 13:47:22.977104, Entry Price: 0, Exit Price: 227.2, Shares: 553.0, Profit: 125641.59999999999, Duration: 0 mins

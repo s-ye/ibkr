@@ -14,20 +14,6 @@ logger = logging.getLogger(__name__)
 if not os.path.exists('output'):
     os.makedirs('output')
 
-# Set up trade-specific logger
-trade_logger = logging.getLogger('trade_logger')
-trade_log_file = 'output/trades.log'
-trade_handler = logging.FileHandler(trade_log_file, mode='a')
-trade_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
-trade_logger.addHandler(trade_handler)
-trade_logger.setLevel(logging.INFO)
-trade_logger.propagate = False  # Prevents duplication in root logger
-
-# Ensure logger writes to file immediately
-trade_handler.flush = lambda: trade_handler.stream.flush()
-
-# Sample logging call for testing
-trade_logger.info("Trade logging initialized and working correctly.")
 # Connect to IBKR
 ib = IB()
 
@@ -91,13 +77,13 @@ def on_price_update(ticker: Ticker):
         if len(strategy.trades) > initial_trade_count:
             last_trade = strategy.trades[-1]
             trade_type = "Buy" if last_trade['shares'] > 0 else "Sell"
-            trade_logger.info(
+            strategy.logger.info(
                 f"{trade_type} executed - Entry Date: {last_trade['entry_date']}, "
                 f"Exit Date: {last_trade['exit_date']}, Entry Price: {last_trade['entry_price']}, "
                 f"Exit Price: {last_trade['exit_price']}, Shares: {last_trade['shares']}, "
                 f"Profit: {last_trade['profit']}, Duration: {last_trade['duration']} mins"
             )
-            trade_handler.flush()  # Ensure immediate write to file
+
         else:
             logger.debug("No new trade executed.")
         # Add a delay between price updates
