@@ -34,14 +34,24 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         self.plot_indicators()
 
         # Identify Buy signals
-        buys = self.data_with_signals[(self.data_with_signals['signal'] == 1) & (self.data_with_signals['signal'].shift(1) != 1)]
-        buy_dates = buys.index
-        buy_prices = buys['close']
+        # use the _should_buy rule to get the buy signals
 
-        # Identify Sell signals
-        sells = self.data_with_signals[(self.data_with_signals['signal'] == -1) & (self.data_with_signals['signal'].shift(1) != -1)]
-        sell_dates = sells.index
-        sell_prices = sells['close']
+        # Initialize lists to collect buy/sell data
+        buy_dates = []
+        buy_prices = []
+        sell_dates = []
+        sell_prices = []
+
+        # Iterate over the rows to apply the _should_buy and _should_sell conditions
+        for i in range(len(self.data_with_signals)):
+            if self._should_buy(i):
+                buy_dates.append(self.data_with_signals.index[i])  # Record the index (date)
+                buy_prices.append(self.data_with_signals['close'].iloc[i])  # Record the close price
+
+            if self._should_sell(i):
+                sell_dates.append(self.data_with_signals.index[i])  # Record the index (date)
+                sell_prices.append(self.data_with_signals['close'].iloc[i])  # Record the close price
+
 
         # Identify Profit-Taking Exits
         profit_exits = self.data_with_signals[self.data_with_signals['profit_take']]
@@ -54,7 +64,7 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         stop_prices = stop_exits['close']
 
         # Plot Buy Signals
-        if not buy_dates.empty:
+        if buy_dates:
             plt.plot(buy_dates, buy_prices, '^', markersize=10, color='green', label='Buy Signal')
 
         # Plot Profit-Taking Exits
@@ -65,7 +75,7 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         if not stop_dates.empty:
             plt.plot(stop_dates, stop_prices, 'x', markersize=8, color='red', label='Stop-Loss Exit')
 
-        if not sell_dates.empty:
+        if sell_dates:
             plt.plot(sell_dates, sell_prices, 'v', markersize=10, color='black', label='Sell Signal')
 
         # Add title, legend, and labels
