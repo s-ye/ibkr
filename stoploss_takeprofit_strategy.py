@@ -232,7 +232,7 @@ class StopLossTakeProfitStrategy(BaseStrategy):
             self.avg_entry_price = 0
             self.entry_date = None
             self.highest_price_since_entry = 0
-            
+
             return trade
         self.logger.warning("No position to sell.")
         return None
@@ -287,6 +287,9 @@ class StopLossTakeProfitStrategy(BaseStrategy):
                 self.paper_trade_sell(latest_price, 'profit_take')
             elif self._hit_trailing_stop(latest_price):
                 self.paper_trade_sell(latest_price, 'stop_loss')
+
+        if self.current_position > 0:
+            self.highest_price_since_entry = max(self.highest_price_since_entry, latest_price)
 
     # support second-by-second updates
     def update_with_price(self, current_price, current_time):
