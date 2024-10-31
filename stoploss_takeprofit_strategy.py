@@ -12,6 +12,7 @@ class StopLossTakeProfitStrategy(BaseStrategy):
     def __init__(self, stock, data, ib, params=None, initial_capital=1_000_000, position_size_pct=0.02, profit_target_pct=0.05, trailing_stop_pct=0.03):
         super().__init__(stock, data, ib, params, initial_capital, position_size_pct)
         self.profit_target_pct = profit_target_pct
+        self.contract = stock
         self.trailing_stop_pct = trailing_stop_pct
         self.current_position = 0
         self.current_balance = self.initial_capital
@@ -135,7 +136,7 @@ class StopLossTakeProfitStrategy(BaseStrategy):
 
     def _buy_position(self, current_price, index):
         """Execute a buy operation."""
-        shares_to_buy = (self.current_balance * self.position_size_pct) / current_price
+        shares_to_buy = (self.current_balance * self.position_size_pct) // current_price
         buy_cost = shares_to_buy * current_price
         if shares_to_buy > 0 and buy_cost <= self.current_balance:
             self.avg_entry_price = ((self.avg_entry_price * self.current_position) + (current_price * shares_to_buy)) / (self.current_position + shares_to_buy)
@@ -179,23 +180,61 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         self.highest_price_since_entry = 0
 
     def paper_trade_buy(self, current_price):
-        shares_to_buy = (self.current_balance * self.position_size_pct) / current_price
-        if shares_to_buy > 0 and shares_to_buy * current_price <= self.current_balance:
+        shares_to_buy = (self.current_balance * self.position_size_pct) // current_price
+        buy_cost = shares_to_buy * current_price
+        if shares_to_buy > 0 and buy_cost <= self.current_balance:
+            self.avg_entry_price = ((self.avg_entry_price * self.current_position) + (current_price * shares_to_buy)) / (self.current_position + shares_to_buy)
+            self.current_balance -= buy_cost
+            self.current_position += shares_to_buy
+            self.entry_date = self.data_with_signals.index[-1]
+            self.highest_price_since_entry = current_price
+            # Above was the internal, now we place the order
             order = MarketOrder('BUY', shares_to_buy)
             trade = self.ib.placeOrder(self.contract, order)
-            logging.info(f"Paper trade BUY order for {shares_to_buy:.2f} shares at {current_price} placed.")
+            self.logger.info(f"Paper trade BUY order for {shares_to_buy:.2f} shares at {current_price} placed.")
+            # log the current value of the portfolio
+            self.logger.info(f"Current portfolio value: {self.current_balance + self.current_position * current_price}")
             return trade
-        logging.warning("Insufficient balance for buy order.")
+        self.logger.warning("Insufficient balance for buy order.")
         return None
 
     # Paper trading method to place a live sell order
-    def paper_trade_sell(self, current_price):
+    def paper_trade_sell(self, current_price, exit_type):
         if self.current_position > 0:
+            sell_revenue = self.current_position * current_price
+            profit = (current_price - self.avg_entry_price) * self.current_position
+            if self.entry_date is not None:
+                duration_minutes = (self.data_with_signals.index[-1] - self.entry_date).total_seconds() / 60
+            else:
+                # Handle case when entry_date is None
+                duration_minutes = 0  # Default to 0 or any other default duration you prefer
+                self.logger.warning("Warning: entry_date is None when calculating duration in _sell_position.")
+
+            self.current_balance += sell_revenue
+            self.trades.append({
+                'entry_date': self.entry_date,
+                'exit_date': self.data_with_signals.index[-1],
+                'entry_price': self.avg_entry_price,
+                'exit_price': current_price,
+                'shares': self.current_position,
+                'return': profit / (self.avg_entry_price * self.current_position),
+                'profit': profit,
+                'duration': duration_minutes
+            })
+            self.data_with_signals.at[self.data_with_signals.index[-1], exit_type] = True
+            # Above was the internal, now we place the order
             order = MarketOrder('SELL', self.current_position)
             trade = self.ib.placeOrder(self.contract, order)
-            logging.info(f"Paper trade SELL order for {self.current_position:.2f} shares at {current_price} placed.")
+            self.logger.info(f"Paper trade SELL order for {self.current_position:.2f} shares at {current_price} placed." + exit_type)
+            # log the current value of the portfolio
+            self.logger.info(f"Current portfolio value: {self.current_balance}")
+            self.current_position = 0
+            self.avg_entry_price = 0
+            self.entry_date = None
+            self.highest_price_since_entry = 0
+            
             return trade
-        logging.warning("No position to sell.")
+        self.logger.warning("No position to sell.")
         return None
 
     def _hit_profit_target(self, current_price):
@@ -241,8 +280,13 @@ class StopLossTakeProfitStrategy(BaseStrategy):
             self.paper_trade_buy(latest_price)
 
         # Check sell signal and place paper trade if signal changes to -1
-        elif self.data['signal'].iloc[-1] == -1 and self.data['signal'].iloc[-2] == 1:
-            self.paper_trade_sell(latest_price)
+        elif self.current_position > 0:
+            if self.data['signal'].iloc[-1] == -1 and self.data['signal'].iloc[-2] == 1:
+                self.paper_trade_sell(latest_price, 'signal')
+            elif self._hit_profit_target(latest_price):
+                self.paper_trade_sell(latest_price, 'profit_take')
+            elif self._hit_trailing_stop(latest_price):
+                self.paper_trade_sell(latest_price, 'stop_loss')
 
     # support second-by-second updates
     def update_with_price(self, current_price, current_time):

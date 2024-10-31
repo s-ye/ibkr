@@ -1,4 +1,0 @@
-2024-10-31 00:54:46,676 - Starting SidewaysBollingerBandsStrategy with initial capital: 1000000
-2024-10-31 00:54:46,676 - Hyperparameters: {'period': 20, 'std_dev': 2.5, 'rsi_window': 14}
-2024-10-31 00:54:46,679 - Buy 89.96 shares at 222.33 on 2024-10-07 14:30:00-04:00
-2024-10-31 00:54:46,679 - Sell 89.96 shares at 225.06 on 2024-10-08 09:30:00-04:00 (Exit: Signal, Profit: 245.5808932667647, Duration: 1140.0 minutes)
