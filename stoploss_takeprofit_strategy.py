@@ -21,6 +21,11 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         self._setup_logger()
 
     # existing methods like _execute_trades, _should_buy, etc.
+    def _should_buy(self, i):
+        return self.data_with_signals['signal'].iloc[i] == 1 and self.data_with_signals['signal'].iloc[i - 1] != 1
+
+    def _should_sell(self, i):
+        return self.data_with_signals['signal'].iloc[i] == -1 and self.data_with_signals['signal'].iloc[i - 1] != -1
 
     def plot_trades(self, filename=None):
         """Plot close price with indicators, buy signals, profit-taking, and stop-loss exits."""
@@ -32,6 +37,11 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         buys = self.data_with_signals[(self.data_with_signals['signal'] == 1) & (self.data_with_signals['signal'].shift(1) != 1)]
         buy_dates = buys.index
         buy_prices = buys['close']
+
+        # Identify Sell signals
+        sells = self.data_with_signals[(self.data_with_signals['signal'] == -1) & (self.data_with_signals['signal'].shift(1) != -1)]
+        sell_dates = sells.index
+        sell_prices = sells['close']
 
         # Identify Profit-Taking Exits
         profit_exits = self.data_with_signals[self.data_with_signals['profit_take']]
@@ -55,6 +65,9 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         if not stop_dates.empty:
             plt.plot(stop_dates, stop_prices, 'x', markersize=8, color='red', label='Stop-Loss Exit')
 
+        if not sell_dates.empty:
+            plt.plot(sell_dates, sell_prices, 'v', markersize=10, color='black', label='Sell Signal')
+
         # Add title, legend, and labels
         param_str = "_".join([f"{k}{v}" for k, v in self.params.items()])
         # Add profit target and stop loss to title
@@ -76,6 +89,7 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         """Override in subclasses to plot strategy-specific indicators."""
         pass
 
+
     def _execute_trades(self):
         """Manage entries and exits with stop-loss and take-profit logic."""
         self.data_with_signals['profit_take'] = False
@@ -92,7 +106,9 @@ class StopLossTakeProfitStrategy(BaseStrategy):
 
             # Sell logic (profit-taking or stop-loss)
             elif self.current_position > 0:
-                if self._hit_profit_target(current_price):
+                if self._should_sell(i):
+                    self._sell_position(current_price, i, 'signal')
+                elif self._hit_profit_target(current_price):
                     self._sell_position(current_price, i, 'profit_take')
                 elif self._hit_trailing_stop(current_price):
                     self._sell_position(current_price, i, 'stop_loss')
@@ -103,10 +119,6 @@ class StopLossTakeProfitStrategy(BaseStrategy):
 
         # Final portfolio value calculation if still holding shares
         self.final_portfolio_value = self.current_balance + (self.current_position * self.data_with_signals['close'].iloc[-1])
-
-    def _should_buy(self, i):
-        """Determine whether a buy signal exists. To be customized in subclass."""
-        raise NotImplementedError("Subclasses should implement _should_buy.")
 
     def _buy_position(self, current_price, index):
         """Execute a buy operation."""
@@ -124,7 +136,15 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         """Helper method to execute a sell operation and log the type of exit."""
         sell_revenue = self.current_position * current_price
         profit = (current_price - self.avg_entry_price) * self.current_position
-        duration_minutes = (self.data_with_signals.index[index] - self.entry_date).total_seconds() / 60
+        
+        # Check if entry_date is not None before calculating duration
+        if self.entry_date is not None:
+            duration_minutes = (self.data_with_signals.index[index] - self.entry_date).total_seconds() / 60
+        else:
+            # Handle case when entry_date is None
+            duration_minutes = 0  # Default to 0 or any other default duration you prefer
+            self.logger.warning("Warning: entry_date is None when calculating duration in _sell_position.")
+        
         self.current_balance += sell_revenue
         self.trades.append({
             'entry_date': self.entry_date,
@@ -138,6 +158,8 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         })
         self.data_with_signals.at[self.data_with_signals.index[index], exit_type] = True
         self.logger.info(f"Sell {self.current_position:.2f} shares at {current_price} on {self.data_with_signals.index[index]} (Exit: {exit_type.capitalize()}, Profit: {profit}, Duration: {duration_minutes} minutes)")
+        
+        # Reset position attributes
         self.current_position = 0
         self.avg_entry_price = 0
         self.entry_date = None

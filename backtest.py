@@ -30,7 +30,7 @@ ib = IB()
 ib.connect('127.0.0.1', 7497, clientId=1)
 
 # Define stock and parameters
-stock = Stock('NVO', 'SMART', 'USD')
+stock = Stock('AAPL', 'SMART', 'USD')
 ib.qualifyContracts(stock)
 
 # Request historical data (15 minute delay)

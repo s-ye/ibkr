@@ -1,36 +1,36 @@
-2024-10-30 22:04:46.714891 - Final statistics: total_trades: 3, 
-winning_trades: 0, 
-losing_trades: 3, 
-average_return: -0.05454346233290406, 
-average_duration: 4380.0, 
-final_balance: 605042.1204323415, 
-final_portfolio_value: 949673.9743347912, 
-
-
-2024-10-30 22:04:46.561928 - Final statistics: total_trades: 10, 
-winning_trades: 4, 
+2024-10-31 00:35:08.970534 - Final statistics: total_trades: 22, 
+winning_trades: 16, 
 losing_trades: 6, 
-average_return: -0.009855799116285513, 
-average_duration: 4470.0, 
-final_balance: 959209.8415660333, 
-final_portfolio_value: 1000061.694514761, 
+average_return: 0.0041654637167404685, 
+average_duration: 876.8181818181819, 
+final_balance: 1001643.5529235706, 
+final_portfolio_value: 1001643.5529235706, 
 
 
-2024-10-30 22:04:46.409481 - Final statistics: total_trades: 8, 
-winning_trades: 5, 
-losing_trades: 3, 
-average_return: 0.010706243939348506, 
-average_duration: 5621.25, 
-final_balance: 665906.4978585674, 
-final_portfolio_value: 970282.2027961107, 
-
-
-2024-10-30 22:04:46.231603 - Final statistics: total_trades: 13, 
-winning_trades: 7, 
+2024-10-31 00:35:08.788992 - Final statistics: total_trades: 22, 
+winning_trades: 16, 
 losing_trades: 6, 
-average_return: 0.001455621466980239, 
-average_duration: 4441.153846153846, 
-final_balance: 959226.4938013034, 
-final_portfolio_value: 1000079.0559532075, 
+average_return: 0.0041654637167404685, 
+average_duration: 876.8181818181819, 
+final_balance: 1001643.5529235706, 
+final_portfolio_value: 1001643.5529235706, 
+
+
+2024-10-31 00:35:08.634935 - Final statistics: total_trades: 23, 
+winning_trades: 17, 
+losing_trades: 6, 
+average_return: 0.005586863083122725, 
+average_duration: 1010.2173913043479, 
+final_balance: 1002381.9174563806, 
+final_portfolio_value: 1002381.9174563806, 
+
+
+2024-10-31 00:35:08.479325 - Final statistics: total_trades: 23, 
+winning_trades: 17, 
+losing_trades: 6, 
+average_return: 0.005566708408303968, 
+average_duration: 1010.2173913043479, 
+final_balance: 1003087.1276502102, 
+final_portfolio_value: 1003087.1276502102, 
 
 

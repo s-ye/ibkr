@@ -23,11 +23,7 @@ class SmaCrossoverStrategy(StopLossTakeProfitStrategy):
         self.data['position'] = self.data['signal'].shift(1)
         
         return self.data
-
-    def _should_buy(self, i):
-        """Custom buy logic for SMA crossover: Buy when fast SMA crosses above slow SMA."""
-        return self.data_with_signals['signal'].iloc[i] == 1 and self.data_with_signals['signal'].iloc[i - 1] != 1
-
+    
     def plot_indicators(self):
         """Plot the SMA lines."""
         plt.plot(self.data_with_signals['fast_sma'], label=f"{self.params.get('fast_period', 10)}-Period SMA", color='orange')
@@ -55,10 +51,6 @@ class BollingerBandsStrategy(StopLossTakeProfitStrategy):
         self.data['position'] = self.data['signal'].shift(1)
         
         return self.data
-
-    def _should_buy(self, i):
-        """Custom buy logic for Bollinger Bands: Buy when close price crosses above lower band."""
-        return self.data_with_signals['signal'].iloc[i] == 1 and self.data_with_signals['signal'].iloc[i - 1] != 1
 
     def plot_indicators(self):
         """Plot Bollinger Bands."""
@@ -101,5 +93,5 @@ class SidewaysBollingerBandsStrategy(StopLossTakeProfitStrategy):
         return self.data
 
     def _should_buy(self, i):
-        """Custom buy logic based on Bollinger Bands."""
+        """Custom buy logic based on Sideways Bollinger Bands."""
         return self.data_with_signals['signal'].iloc[i] == 1 and self.data_with_signals['signal'].iloc[i - 1] != 1 and self.data_with_signals['rsi'].iloc[i] < 30
