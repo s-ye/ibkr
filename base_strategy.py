@@ -26,8 +26,6 @@ class BaseStrategy:
         self.avg_entry_price = 0  # Track average entry price
         self.entry_date = None  # Track the date when the current position was opened
 
-        self._setup_logger()
-
     def log_statistics_and_trades(self, statistics):
         # Format hyperparameters in filename
         hyperparam_str = "_".join([f"{k}{v}" for k, v in self.params.items()])
@@ -128,7 +126,7 @@ class BaseStrategy:
                     self.logger.info(f"Buy {shares_to_buy} shares at {current_price} on {self.entry_date}")
 
             # Sell on signal change to -1 (if the previous signal was 1)
-            elif self.data_with_signals['signal'].iloc[i] == -1 and self.data_with_signals['signal'].iloc[i-1] == 1:
+            elif self.data_with_signals['signal'].iloc[i] == -1 and self.data_with_signals['signal'].iloc[i-1] != -1:
                 if self.current_position > 0 and self.entry_date is not None:
                     sell_revenue = self.current_position * current_price
                     profit = (current_price - self.avg_entry_price) * self.current_position
@@ -222,13 +220,14 @@ class BaseStrategy:
         # Set up the plot
         plt.figure(figsize=(14, 7))
         plt.plot(self.data_with_signals['close'], label='Close Price', color='blue')
+        self.plot_indicators()
 
         # Plot buy and sell signals based on signal changes
         buys = self.data_with_signals[(self.data_with_signals['signal'] == 1) & (self.data_with_signals['signal'].shift(1) != 1)]
         buy_dates = buys.index
         buy_prices = buys['close']
 
-        sells = self.data_with_signals[(self.data_with_signals['signal'] == -1) & (self.data_with_signals['signal'].shift(1) == 1)]
+        sells = self.data_with_signals[(self.data_with_signals['signal'] == -1) & (self.data_with_signals['signal'].shift(1) != 1)]
         sell_dates = sells.index
         sell_prices = sells['close']
 
