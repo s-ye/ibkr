@@ -127,8 +127,11 @@ class StopLossTakeProfitStrategy(BaseStrategy):
             if self.current_position > 0:
                 self.highest_price_since_entry = max(self.highest_price_since_entry, current_price)
 
-        # Final portfolio value calculation if still holding shares
-        self.final_portfolio_value = self.current_balance + (self.current_position * self.data_with_signals['close'].iloc[-1])
+        # Final portfolio value calculation if still holding shares, skip if no trades executed
+        if self.current_position > 0:
+            self.final_portfolio_value = self.current_balance + (self.current_position * self.data_with_signals['close'].iloc[-1])
+        else:
+            self.final_portfolio_value = self.current_balance
 
     def _buy_position(self, current_price, index):
         """Execute a buy operation."""

@@ -88,8 +88,11 @@ class BaseStrategy:
         self.data_with_signals = self.generate_signals()
         self._execute_trades()
         
-        # After all trades, store the final portfolio value
-        self.final_portfolio_value = self.current_balance + (self.current_position * self.data_with_signals['close'].iloc[-1])
+        # After all trades, store the final portfolio value, if trades were made
+        if self.trades:
+            self.final_portfolio_value = self.current_balance + (self.current_position * self.data_with_signals['close'].iloc[-1])
+        else:
+            self.final_portfolio_value = self.current_balance
         return self.data_with_signals
 
     # other methods remain the same

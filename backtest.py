@@ -38,7 +38,7 @@ bars = ib.reqHistoricalData(
     stock,
     endDateTime='',
     durationStr='1 Y',
-    barSizeSetting='15 mins',
+    barSizeSetting='30 mins',
     whatToShow='MIDPOINT',
     useRTH=True
 )
