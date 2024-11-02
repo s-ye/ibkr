@@ -3,6 +3,8 @@ from base_strategy import BaseStrategy
 import pandas as pd
 import matplotlib.pyplot as plt
 from stoploss_takeprofit_strategy import StopLossTakeProfitStrategy
+from datetime import time
+import yfinance as yf
 
 
 class SmaCrossoverStrategy(StopLossTakeProfitStrategy):
@@ -95,3 +97,78 @@ class SidewaysBollingerBandsStrategy(StopLossTakeProfitStrategy):
     def _should_buy(self, i):
         """Custom buy logic based on Sideways Bollinger Bands."""
         return self.data_with_signals['signal'].iloc[i] == 1 and self.data_with_signals['signal'].iloc[i - 1] != 1 and self.data_with_signals['rsi'].iloc[i] < 30
+    
+class MorningDipAfternoonRecoveryStrategy(StopLossTakeProfitStrategy):
+    def __init__(self, stock, data, ib, params=None, initial_capital=1_000_000, position_size_pct=0.02, profit_target_pct=0.05, trailing_stop_pct=0.03):
+        super().__init__(stock, data, ib, params, initial_capital, position_size_pct, profit_target_pct, trailing_stop_pct)
+
+    def generate_signals(self):
+        """
+        Generate buy/sell signals based on the dip-recovery pattern.
+        A 'dip' is identified by a price drop in the morning (e.g., before 11 AM),
+        followed by a recovery after noon.
+        """
+        self.data['signal'] = 0  # Reset signals
+        std_dev = self.params.get('std_dev', 1.5)
+        period = self.params.get('period', 10)
+
+
+        # Calculate rolling mean and standard deviation to detect morning dips
+        self.data['rolling_mean'] = self.data['close'].rolling(window=period).mean()
+        self.data['rolling_std'] = self.data['close'].rolling(window=period).std()
+        self.data['rolling_vol'] = self.data['volume'].rolling(window=period).mean()
+
+        # calculate rsi
+        delta = self.data['close'].diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+        rs = gain / loss
+        self.data['rsi'] = 100 - (100 / (1 + rs))
+
+
+
+        # Identify dips in the morning using volume
+        morning_data = self.data.between_time('09:30', '11:00')
+        self.data['is_morning_dip'] = ((self.data['close'] < self.data['rolling_mean'] - std_dev * self.data['rolling_std'])
+                                        & (self.data.index.time <= time(11, 0)) & (self.data['volume'] > self.data['rolling_vol']))
+
+        # Identify afternoon recovery by checking if price is back to the rolling mean level
+       
+        # Generate buy signals: Buy on morning dip
+        self.data.loc[self.data['is_morning_dip'], 'signal'] = 1
+
+        # Generate sell signals: Sell when RSI is above 70 and price is above rolling mean and volume is above rolling volume
+        self.data.loc[(self.data['rsi'] > 70) & (self.data['close'] > self.data['rolling_mean']) & (self.data['volume'] > self.data['rolling_vol']), 'signal'] = -1
+
+
+        return self.data
+
+    def _should_buy(self, i):
+        """
+        Override buy logic to only buy during a morning dip.
+        """
+        return self.data_with_signals['signal'].iloc[i] == 1 and self.data_with_signals['signal'].iloc[i - 1] != 1
+
+    def _should_sell(self, i):
+        """
+        Override sell logic to sell on afternoon recovery.
+        """
+        return self.data_with_signals['signal'].iloc[i] == -1 and self.data_with_signals['signal'].iloc[i - 1] != -1
+
+    def run_strategy(self):
+        """
+        Execute the strategy, which buys during morning dips and sells on afternoon recovery,
+        with stop-loss and take-profit in place from the superclass.
+        """
+        self._execute_trades()
+
+    def plot_indicators(self):
+        """
+        Override to plot morning dip and afternoon recovery indicators for analysis.
+        """
+        plt.plot(self.data_with_signals['rolling_mean'], label='Rolling Mean', linestyle='--', color='orange')
+        # show the rolling mean - std dev * std dev
+        plt.plot(self.data_with_signals['rolling_mean'] - self.params.get('std_dev', 1.5) * self.data_with_signals['rolling_std'], label='Upper Band', linestyle='--', color='red')
+        # show the rolling mean + std dev * std dev
+        plt.plot(self.data_with_signals['rolling_mean'] + self.params.get('std_dev', 1.5) * self.data_with_signals['rolling_std'], label='Lower Band', linestyle='--', color='green')
+        # show the volume as a bar chart with seperate y axis

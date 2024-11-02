@@ -83,7 +83,6 @@ def on_price_update(ticker: Ticker):
                 f"Exit Price: {last_trade['exit_price']}, Shares: {last_trade['shares']}, "
                 f"Profit: {last_trade['profit']}, Duration: {last_trade['duration']} mins"
             )
-
         else:
             logger.debug("No new trade executed.")
         # Add a delay between price updates

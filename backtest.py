@@ -2,6 +2,8 @@
 from ib_insync import IB, Stock, util
 from strategies import *
 from itertools import product
+import numpy as np
+import yfinance as yf
 
 class Backtester:
     def __init__(self, stock_symbol, exchange, currency, client_id=1):
@@ -9,18 +11,31 @@ class Backtester:
         self.ib.connect('127.0.0.1', 7497, clientId=client_id)
         self.stock = Stock(stock_symbol, exchange, currency)
         self.ib.qualifyContracts(self.stock)
-        self.data = self._get_historical_data()
+        self.data = self._get_historical_data(stock_symbol)
 
-    def _get_historical_data(self):
+    def _get_historical_data(self, stock_symbol):
         bars = self.ib.reqHistoricalData(
             self.stock,
             endDateTime='',
-            durationStr='2 D',
-            barSizeSetting='1 min',
+            durationStr='30 D',
+            barSizeSetting='15 mins',
             whatToShow='MIDPOINT',
             useRTH=True
         )
-        return util.df(bars)
+        # doesn't come with volume data, so we'll add it
+        # from yfinance
+        
+        # df = util.df(bars)
+        yahoo_data = yf.Ticker(stock_symbol).history(period='3mo', interval='1h')
+        # rename Close to close
+        yahoo_data.rename(columns={'Close': 'close'}, inplace=True)
+        # rename Volume to volume
+        yahoo_data.rename(columns={'Volume': 'volume'}, inplace=True)
+
+
+
+        # df['volume'] = yahoo_data['Volume'].values
+        return yahoo_data
 
     def run_sma_strategy(self, sma_params):
         for fast_period, slow_period, take_profit_pct, stop_loss_pct in product(
@@ -86,6 +101,28 @@ class Backtester:
             sbb_strategy.plot_trades()
             print(sbb_strategy.trade_statistics())
 
+    def run_mdar_strategy(self, mdar_params):
+        for period, std_dev, take_profit_pct, stop_loss_pct in product(
+                mdar_params['period'],
+                mdar_params['std_dev'],
+                mdar_params['take_profit_pct'],
+                mdar_params['stop_loss_pct']
+            ):
+            print(f"\nRunning Morning Dip Afternoon Recovery Strategy with period={period}, std_dev={std_dev}, "
+                  f"take_profit_pct={take_profit_pct}, stop_loss_pct={stop_loss_pct}")
+            mdar_strategy = MorningDipAfternoonRecoveryStrategy(
+                self.stock, self.data, self.ib,
+                params={'period': period, 'std_dev': std_dev},
+                initial_capital=1_000_000,
+                profit_target_pct=take_profit_pct,
+                trailing_stop_pct=stop_loss_pct
+            )
+            mdar_results = mdar_strategy.backtest()
+            mdar_final_portfolio_value = mdar_strategy.final_portfolio_value
+            mdar_strategy.plot_trades()
+            print(mdar_strategy.trade_statistics())
+
+
     def disconnect(self):
         self.ib.disconnect()
 
@@ -113,8 +150,19 @@ if __name__ == "__main__":
         'stop_loss_pct': [0.03, 0.05]    # Stop loss as a percentage
     }
 
-    backtester = Backtester('CVNA', 'SMART', 'USD')
-    backtester.run_sma_strategy(sma_params)
+    mdar_params = {
+        'period': [i for i in range(5, 21)],
+        'std_dev': [.5, 1],
+        'take_profit_pct': [.05],
+        'stop_loss_pct': [.03]
+        # 'take_profit_pct': [0.05, 0.1,.2],  # Profit target as a percentage
+        # 'stop_loss_pct': [0.03, 0.05]    # Stop loss as a percentage
+    }
+
+
+    backtester = Backtester('CPNG', 'SMART', 'USD')
+    # backtester.run_sma_strategy(sma_params)
     # backtester.run_bb_strategy(bb_params)
     # backtester.run_sbb_strategy(sbb_params)
+    backtester.run_mdar_strategy(mdar_params)
     backtester.disconnect()

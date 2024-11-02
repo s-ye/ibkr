@@ -30,9 +30,13 @@ class StopLossTakeProfitStrategy(BaseStrategy):
 
     def plot_trades(self, filename=None):
         """Plot close price with indicators, buy signals, profit-taking, and stop-loss exits."""
-        plt.figure(figsize=(14, 7))
-        plt.plot(self.data_with_signals['close'], label='Close Price', color='blue')
-        self.plot_indicators()
+        fig, ax = plt.subplots(figsize=(14, 7))
+        ax.plot(self.data_with_signals['close'], label='Close Price', color='blue')
+        self.plot_indicators() 
+
+        ax2 = ax.twinx()
+        ax2.bar(self.data_with_signals.index, self.data_with_signals['volume'], alpha=0.3, color='gray', label='Volume', width=0.5)
+        ax2.set_ylabel('Volume')
 
         # Identify Buy signals
         # use the _should_buy rule to get the buy signals
@@ -66,18 +70,18 @@ class StopLossTakeProfitStrategy(BaseStrategy):
 
         # Plot Buy Signals
         if buy_dates:
-            plt.plot(buy_dates, buy_prices, '^', markersize=10, color='green', label='Buy Signal')
+            ax.plot(buy_dates, buy_prices, '^', markersize=10, color='green', label='Buy Signal')
 
         # Plot Profit-Taking Exits
         if not profit_dates.empty:
-            plt.plot(profit_dates, profit_prices, 'o', markersize=8, color='gold', label='Profit-Take Exit')
+            ax.plot(profit_dates, profit_prices, 'o', markersize=8, color='gold', label='Profit-Take Exit')
 
         # Plot Stop-Loss Exits
         if not stop_dates.empty:
-            plt.plot(stop_dates, stop_prices, 'x', markersize=8, color='red', label='Stop-Loss Exit')
+            ax.plot(stop_dates, stop_prices, 'x', markersize=8, color='red', label='Stop-Loss Exit')
 
         if sell_dates:
-            plt.plot(sell_dates, sell_prices, 'v', markersize=10, color='black', label='Sell Signal')
+            ax.plot(sell_dates, sell_prices, 'v', markersize=10, color='black', label='Sell Signal')
 
         # Add title, legend, and labels
         param_str = "_".join([f"{k}{v}" for k, v in self.params.items()])
@@ -86,7 +90,8 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         plt.title(f"{self.stock.symbol} - {self.__class__.__name__} Strategy ({param_str})")
         plt.xlabel('Date')
         plt.ylabel('Price')
-        plt.legend()
+        ax.legend()
+        ax2.legend()
 
         # Set dynamic filename based on final portfolio value
         final_value_str = f"{self.final_portfolio_value:.2f}" if self.final_portfolio_value is not None else "NA"
