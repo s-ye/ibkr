@@ -98,7 +98,7 @@ class SidewaysBollingerBandsStrategy(StopLossTakeProfitStrategy):
         """Custom buy logic based on Sideways Bollinger Bands."""
         return self.data_with_signals['signal'].iloc[i] == 1 and self.data_with_signals['signal'].iloc[i - 1] != 1 and self.data_with_signals['rsi'].iloc[i] < 30
     
-class MorningDipAfternoonRecoveryStrategy(StopLossTakeProfitStrategy):
+class DipRecoverVolumeStrategy(StopLossTakeProfitStrategy):
     def __init__(self, stock, data, ib, params=None, initial_capital=1_000_000, position_size_pct=0.02, profit_target_pct=0.05, trailing_stop_pct=0.03):
         super().__init__(stock, data, ib, params, initial_capital, position_size_pct, profit_target_pct, trailing_stop_pct)
 
@@ -127,34 +127,22 @@ class MorningDipAfternoonRecoveryStrategy(StopLossTakeProfitStrategy):
 
 
 
-        # Identify dips in the morning using volume
-        morning_data = self.data.between_time('09:30', '11:00')
-        self.data['is_morning_dip'] = ((self.data['close'] < self.data['rolling_mean'] - std_dev * self.data['rolling_std'])
-                                        & (self.data.index.time <= time(11, 0)) & (self.data['volume'] > self.data['rolling_vol']))
+        self.data['is_dip'] = ((self.data['close'] < self.data['rolling_mean'] - std_dev * self.data['rolling_std']) & (self.data['volume'] > self.data['rolling_vol']))
 
-        # Identify afternoon recovery by checking if price is back to the rolling mean level
-       
-        # Generate buy signals: Buy on morning dip
-        self.data.loc[self.data['is_morning_dip'], 'signal'] = 1
+        # Generate buy signals: Buy on dip with volume confirmation
+        self.data.loc[self.data['is_dip'], 'signal'] = 1
 
         # Generate sell signals: Sell when RSI is above 70 and price is above rolling mean and volume is above rolling volume
         self.data.loc[(self.data['rsi'] > 70) & (self.data['close'] > self.data['rolling_mean']) & (self.data['volume'] > self.data['rolling_vol']), 'signal'] = -1
-
-
+        # show the buy and sell signals
         return self.data
 
     def _should_buy(self, i):
-        """
-        Override buy logic to only buy during a morning dip.
-        """
-        return self.data_with_signals['signal'].iloc[i] == 1 and self.data_with_signals['signal'].iloc[i - 1] != 1
+        return self.data['signal'].iloc[i] == 1 and self.data['signal'].iloc[i - 1] != 1
 
     def _should_sell(self, i):
-        """
-        Override sell logic to sell on afternoon recovery.
-        """
-        return self.data_with_signals['signal'].iloc[i] == -1 and self.data_with_signals['signal'].iloc[i - 1] != -1
-
+        return self.data['signal'].iloc[i] == -1 and self.data['signal'].iloc[i - 1] != -1
+    
     def run_strategy(self):
         """
         Execute the strategy, which buys during morning dips and sells on afternoon recovery,

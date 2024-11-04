@@ -13,5 +13,5 @@ else
 fi
 
 # Run main.py
-echo "Running backtest.py..."
-python3 backtest.py
+echo "Running graphs.py..."
+python3 graphs.py

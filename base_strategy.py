@@ -13,7 +13,9 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 class BaseStrategy:
     def __init__(self, stock, data, ib, params=None, initial_capital=1_000_000, position_size_pct=0.02):
         self.stock = stock
+        data = data.copy()
         self.data = data  # Historical data
+
         self.ib = ib  # IBKR connection
         self.params = params if params else {}
         self.initial_capital = initial_capital  # Starting capital
@@ -25,6 +27,7 @@ class BaseStrategy:
         self.portfolio_values = []  # Store portfolio value over time
         self.avg_entry_price = 0  # Track average entry price
         self.entry_date = None  # Track the date when the current position was opened
+        self.stats = None  # Store trade statistics
 
     def log_statistics_and_trades(self, statistics):
         # Format hyperparameters in filename
@@ -76,14 +79,20 @@ class BaseStrategy:
         raise NotImplementedError("generate_signals method must be implemented in subclasses.")
 
     def backtest(self):
-        # Prepare data and index for backtesting
-        if 'date' not in self.data.columns:
-            self.data.index = pd.to_datetime(self.data.index, unit='s')
-            self.data['date'] = self.data.index
-        self.data['date'] = pd.to_datetime(self.data['date'], errors='coerce')
-        self.data.set_index('date', inplace=True)
-        self.data.dropna(inplace=True)
 
+    # Prepare data and index for backtesting
+        if 'date' not in self.data.columns:
+            # Convert index to datetime with UTC
+            self.data.index = pd.to_datetime(self.data.index, utc=True)
+            self.data['date'] = self.data.index
+        else:
+            # Ensure 'date' column is in datetime format with UTC
+            self.data['date'] = pd.to_datetime(self.data['date'], utc=True, errors='coerce')
+        
+        # Set 'date' column as the index for the DataFrame
+        self.data.set_index('date', inplace=True)
+        self.data.dropna(inplace=True)  # Drop rows where datetime conversion failed
+        
         # Generate signals and execute trades based on them
         self.data_with_signals = self.generate_signals()
         self._execute_trades()
@@ -98,67 +107,7 @@ class BaseStrategy:
     # other methods remain the same
 
     def _execute_trades(self):
-        self.current_position = 0  # Initialize total shares currently held
-        self.current_balance = self.initial_capital  # Set to initial capital
-        self.avg_entry_price = 0  # Reset average entry price for new backtest run
-        self.entry_date = None  # Reset entry date for new position
-
-        for i in range(1, len(self.data_with_signals)):
-            current_price = self.data_with_signals['close'].iloc[i]
-            # Calculate portfolio value (cash balance + value of held shares)
-            portfolio_value = self.current_balance + (self.current_position * current_price)
-            
-            # Track portfolio value over time
-            self.portfolio_values.append({
-                'date': self.data_with_signals.index[i],
-                'portfolio_value': portfolio_value
-            })
-
-            # Buy on signal change to 1 (if the previous signal was not 1)
-            if self.data_with_signals['signal'].iloc[i] == 1 and self.data_with_signals['signal'].iloc[i-1] != 1:
-                shares_to_buy = (self.current_balance * self.position_size_pct) / current_price
-                buy_cost = shares_to_buy * current_price
-                if shares_to_buy > 0 and buy_cost <= self.current_balance:
-                    # Update average entry price and total position size
-                    self.avg_entry_price = ((self.avg_entry_price * self.current_position) + (current_price * shares_to_buy)) / (self.current_position + shares_to_buy)
-                    self.current_balance -= buy_cost
-                    self.current_position += shares_to_buy  # Update the current position with new shares
-                    self.entry_date = self.data_with_signals.index[i]  # Set entry date for holding duration
-                    print(f"Buy {shares_to_buy} shares at {current_price} on {self.entry_date}")
-                    # write to log file
-                    self.logger.info(f"Buy {shares_to_buy} shares at {current_price} on {self.entry_date}")
-
-            # Sell on signal change to -1 (if the previous signal was 1)
-            elif self.data_with_signals['signal'].iloc[i] == -1 and self.data_with_signals['signal'].iloc[i-1] != -1:
-                if self.current_position > 0 and self.entry_date is not None:
-                    sell_revenue = self.current_position * current_price
-                    profit = (current_price - self.avg_entry_price) * self.current_position
-                    duration_minutes = (self.data_with_signals.index[i] - self.entry_date).total_seconds() / 60  # Duration in minutes
-                    self.current_balance += sell_revenue  # Add revenue from the sale to the balance
-                    self.trades.append({
-                        'entry_date': self.entry_date,
-                        'exit_date': self.data_with_signals.index[i],
-                        'entry_price': self.avg_entry_price,
-                        'exit_price': current_price,
-                        'shares': self.current_position,
-                        'return': profit / (self.avg_entry_price * self.current_position),
-                        'profit': profit,
-                        'duration': duration_minutes  # Store duration in minutes
-                    })
-                    print(f"Sell {self.current_position} shares at {current_price} on {self.data_with_signals.index[i]} (Profit: {profit}, Duration: {duration_minutes} minutes)")
-                    # write to log file
-                    self.logger.info(f"Sell {self.current_position} shares at {current_price} on {self.data_with_signals.index[i]} (Profit: {profit}, Duration: {duration_minutes} minutes)")
-                    # Reset position tracking after selling
-                    self.current_position = 0
-                    self.avg_entry_price = 0
-                    self.entry_date = None  # Reset entry date after a full position is closed
-
-        # Final portfolio value calculation if still holding shares
-        if self.current_position > 0:
-            final_price = self.data_with_signals['close'].iloc[-1]
-            self.final_portfolio_value = self.current_balance + (self.current_position * final_price)
-        else:
-            self.final_portfolio_value = self.current_balance
+       raise NotImplementedError("_execute_trades method must be implemented in subclasses.")
 
     def trade_statistics(self):
         if not self.trades and self.current_position == 0:
@@ -217,6 +166,7 @@ class BaseStrategy:
         }
 
         self.log_statistics_and_trades(stats)
+        return stats
 
     def plot_trades(self, filename=None):
         """Plot the close price with indicators and buy/sell signals for the specified strategy and save to a file."""

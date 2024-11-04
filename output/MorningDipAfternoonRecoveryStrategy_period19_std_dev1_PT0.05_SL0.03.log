@@ -1,4 +1,0 @@
-2024-11-01 20:19:43,799 - Starting MorningDipAfternoonRecoveryStrategy with initial capital: 1000000
-2024-11-01 20:19:43,799 - Hyperparameters: {'period': 19, 'std_dev': 1}
-2024-11-01 20:19:43,802 - Buy 774.00 shares at 25.815000534057617 on 2024-10-31 09:30:00-04:00
-2024-11-01 20:19:43,933 - Holding 774.0 shares as an open position at the end with unrealized return: -0.01685072106495292, Duration: 1800.0 minutes
