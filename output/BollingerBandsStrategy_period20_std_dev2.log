@@ -1,90 +1,90 @@
-2024-11-04 09:47:35.587828 - Final statistics: total_trades: 35, 
-winning_trades: 29, 
-losing_trades: 6, 
-average_return: 0.010651836713168822, 
-average_duration: 1528.2857142857142, 
-final_balance: 974072.97, 
-final_portfolio_value: 1013388.73, 
-
-
-2024-11-04 09:47:31.614738 - Final statistics: total_trades: 40, 
-winning_trades: 30, 
-losing_trades: 10, 
-average_return: 0.0056779190699222, 
-average_duration: 1413.375, 
-final_balance: 948589.2300000001, 
-final_portfolio_value: 1008041.7000000001, 
-
-
-2024-11-04 09:47:28.738253 - Final statistics: total_trades: 36, 
-winning_trades: 26, 
-losing_trades: 10, 
-average_return: 0.0073201584886371, 
-average_duration: 1573.75, 
-final_balance: 1010083.2399999993, 
-final_portfolio_value: 1010083.2399999993, 
-
-
-2024-11-04 09:47:25.191852 - Final statistics: total_trades: 38, 
-winning_trades: 28, 
-losing_trades: 10, 
-average_return: 0.0040198859823769055, 
-average_duration: 1237.5, 
-final_balance: 1000914.1300000008, 
-final_portfolio_value: 1000914.1300000008, 
-
-
-2024-11-04 09:47:20.733696 - Final statistics: total_trades: 36, 
-winning_trades: 29, 
-losing_trades: 7, 
-average_return: 0.010978887309302417, 
-average_duration: 1599.1666666666667, 
-final_balance: 971635.7999999999, 
-final_portfolio_value: 1011637.7999999999, 
-
-
-2024-11-04 09:47:16.810476 - Final statistics: total_trades: 36, 
+2024-11-04 09:51:15.423690 - Final statistics: total_trades: 36, 
 winning_trades: 30, 
 losing_trades: 6, 
-average_return: 0.010717608886019992, 
-average_duration: 1557.5, 
-final_balance: 1012296.8099999996, 
-final_portfolio_value: 1012296.8099999996, 
+average_return: 0.010720134030496624, 
+average_duration: 1594.1666666666667, 
+final_balance: 1012389.5499999999, 
+final_portfolio_value: 1012389.5499999999, 
 
 
-2024-11-04 09:47:12.849025 - Final statistics: total_trades: 34, 
-winning_trades: 28, 
-losing_trades: 6, 
-average_return: 0.009390340846420778, 
-average_duration: 1644.264705882353, 
-final_balance: 1014582.0799999997, 
-final_portfolio_value: 1014582.0799999997, 
-
-
-2024-11-04 09:47:08.759441 - Final statistics: total_trades: 37, 
-winning_trades: 28, 
-losing_trades: 9, 
-average_return: 0.003945413133730551, 
-average_duration: 1307.027027027027, 
-final_balance: 1000931.7100000003, 
-final_portfolio_value: 1000931.7100000003, 
-
-
-2024-11-04 09:47:00.305237 - Final statistics: total_trades: 36, 
-winning_trades: 30, 
-losing_trades: 6, 
-average_return: 0.010544414108508666, 
-average_duration: 1526.6666666666667, 
-final_balance: 991897.7099999996, 
-final_portfolio_value: 1012170.7099999996, 
-
-
-2024-11-04 09:46:53.586556 - Final statistics: total_trades: 39, 
+2024-11-04 09:51:12.603552 - Final statistics: total_trades: 33, 
 winning_trades: 27, 
+losing_trades: 6, 
+average_return: 0.009175749999681352, 
+average_duration: 1692.7272727272727, 
+final_balance: 1011605.0600000004, 
+final_portfolio_value: 1011605.0600000004, 
+
+
+2024-11-04 09:51:09.413328 - Final statistics: total_trades: 36, 
+winning_trades: 27, 
+losing_trades: 9, 
+average_return: 0.004830551111331039, 
+average_duration: 1326.25, 
+final_balance: 961410.6200000001, 
+final_portfolio_value: 1000624.7000000001, 
+
+
+2024-11-04 09:51:06.512049 - Final statistics: total_trades: 38, 
+winning_trades: 28, 
+losing_trades: 10, 
+average_return: 0.007002207968327168, 
+average_duration: 1475.5263157894738, 
+final_balance: 1010372.9100000006, 
+final_portfolio_value: 1010372.9100000006, 
+
+
+2024-11-04 09:51:03.695510 - Final statistics: total_trades: 35, 
+winning_trades: 27, 
+losing_trades: 8, 
+average_return: 0.008310068839304121, 
+average_duration: 1680.4285714285713, 
+final_balance: 973943.6999999995, 
+final_portfolio_value: 1014260.9499999995, 
+
+
+2024-11-04 09:51:00.889663 - Final statistics: total_trades: 30, 
+winning_trades: 23, 
+losing_trades: 7, 
+average_return: 0.006827406229920509, 
+average_duration: 1205.0, 
+final_balance: 1006430.5199999997, 
+final_portfolio_value: 1006430.5199999997, 
+
+
+2024-11-04 09:50:57.460314 - Final statistics: total_trades: 33, 
+winning_trades: 27, 
+losing_trades: 6, 
+average_return: 0.010281259983108214, 
+average_duration: 1325.0, 
+final_balance: 1010770.1899999996, 
+final_portfolio_value: 1010770.1899999996, 
+
+
+2024-11-04 09:50:53.362469 - Final statistics: total_trades: 33, 
+winning_trades: 27, 
+losing_trades: 6, 
+average_return: 0.009175749999681352, 
+average_duration: 1692.7272727272727, 
+final_balance: 1011605.0600000004, 
+final_portfolio_value: 1011605.0600000004, 
+
+
+2024-11-04 09:50:49.251594 - Final statistics: total_trades: 35, 
+winning_trades: 23, 
 losing_trades: 12, 
-average_return: 0.00478145710205482, 
-average_duration: 1473.8461538461538, 
-final_balance: 965662.3599999996, 
-final_portfolio_value: 1005402.5799999996, 
+average_return: 0.002903675263445868, 
+average_duration: 1472.142857142857, 
+final_balance: 1002275.4100000001, 
+final_portfolio_value: 1002275.4100000001, 
+
+
+2024-11-04 09:50:45.543482 - Final statistics: total_trades: 42, 
+winning_trades: 32, 
+losing_trades: 10, 
+average_return: 0.007820116991725577, 
+average_duration: 1494.2857142857142, 
+final_balance: 1006583.4699999996, 
+final_portfolio_value: 1006583.4699999996, 
 
 

@@ -1,16 +1,14 @@
-2024-11-04 09:47:36,925 - Starting SidewaysBollingerBandsStrategy with initial capital: 1000000
-2024-11-04 09:47:36,925 - Hyperparameters: {'period': 20, 'std_dev': 1, 'rsi_window': 28}
-2024-11-04 09:47:36,941 - Buy 1097.00 shares at 18.23 on 2024-03-15 13:30:00+00:00
-2024-11-04 09:47:36,942 - Sell 1097.00 shares at 18.11 on 2024-03-15 18:15:00+00:00 (Exit: Signal, Profit: -131.6400000000011, Duration: 285.0 minutes)
-2024-11-04 09:47:36,944 - Buy 1136.00 shares at 17.59 on 2024-03-22 19:15:00+00:00
-2024-11-04 09:47:36,944 - Sell 1136.00 shares at 17.55 on 2024-03-25 16:15:00+00:00 (Exit: Signal, Profit: -45.43999999999903, Duration: 4140.0 minutes)
-2024-11-04 09:47:36,955 - Buy 927.00 shares at 21.56 on 2024-05-08 13:30:00+00:00
-2024-11-04 09:47:36,956 - Sell 927.00 shares at 21.23 on 2024-05-09 13:30:00+00:00 (Exit: Stop_loss, Profit: -305.90999999999843, Duration: 1440.0 minutes)
-2024-11-04 09:47:36,960 - Buy 894.00 shares at 22.34 on 2024-05-23 14:30:00+00:00
-2024-11-04 09:47:36,960 - Sell 894.00 shares at 22.56 on 2024-05-23 15:00:00+00:00 (Exit: Signal, Profit: 196.67999999999898, Duration: 30.0 minutes)
-2024-11-04 09:47:36,965 - Buy 950.00 shares at 21.04 on 2024-06-14 13:30:00+00:00
-2024-11-04 09:47:36,966 - Sell 950.00 shares at 21.48 on 2024-06-14 15:00:00+00:00 (Exit: Signal, Profit: 418.0000000000012, Duration: 90.0 minutes)
-2024-11-04 09:47:36,969 - Buy 971.00 shares at 20.6 on 2024-07-01 13:30:00+00:00
-2024-11-04 09:47:36,970 - Sell 971.00 shares at 20.93 on 2024-07-01 14:15:00+00:00 (Exit: Signal, Profit: 320.42999999999836, Duration: 45.0 minutes)
-2024-11-04 09:47:36,974 - Buy 968.00 shares at 20.66 on 2024-07-17 16:15:00+00:00
-2024-11-04 09:47:36,974 - Sell 968.00 shares at 20.8 on 2024-07-17 18:30:00+00:00 (Exit: Signal, Profit: 135.52000000000055, Duration: 135.0 minutes)
+2024-11-04 09:51:16,649 - Starting SidewaysBollingerBandsStrategy with initial capital: 1000000
+2024-11-04 09:51:16,649 - Hyperparameters: {'period': 20, 'std_dev': 1, 'rsi_window': 28}
+2024-11-04 09:51:16,660 - Buy 1429.00 shares at 13.99 on 2024-01-31 14:30:00+00:00
+2024-11-04 09:51:16,660 - Sell 1429.00 shares at 14.28 on 2024-01-31 17:15:00+00:00 (Exit: Signal, Profit: 414.4099999999988, Duration: 165.0 minutes)
+2024-11-04 09:51:16,671 - Buy 1097.00 shares at 18.23 on 2024-03-15 13:30:00+00:00
+2024-11-04 09:51:16,672 - Sell 1097.00 shares at 18.11 on 2024-03-15 18:15:00+00:00 (Exit: Signal, Profit: -131.6400000000011, Duration: 285.0 minutes)
+2024-11-04 09:51:16,674 - Buy 1137.00 shares at 17.59 on 2024-03-22 19:15:00+00:00
+2024-11-04 09:51:16,674 - Sell 1137.00 shares at 17.55 on 2024-03-25 16:15:00+00:00 (Exit: Signal, Profit: -45.47999999999903, Duration: 4140.0 minutes)
+2024-11-04 09:51:16,685 - Buy 927.00 shares at 21.56 on 2024-05-08 13:30:00+00:00
+2024-11-04 09:51:16,686 - Sell 927.00 shares at 21.23 on 2024-05-09 13:30:00+00:00 (Exit: Stop_loss, Profit: -305.90999999999843, Duration: 1440.0 minutes)
+2024-11-04 09:51:16,690 - Buy 895.00 shares at 22.34 on 2024-05-23 14:30:00+00:00
+2024-11-04 09:51:16,690 - Sell 895.00 shares at 22.56 on 2024-05-23 15:00:00+00:00 (Exit: Signal, Profit: 196.89999999999898, Duration: 30.0 minutes)
+2024-11-04 09:51:16,696 - Buy 950.00 shares at 21.04 on 2024-06-14 13:30:00+00:00
+2024-11-04 09:51:16,696 - Sell 950.00 shares at 21.48 on 2024-06-14 15:00:00+00:00 (Exit: Signal, Profit: 418.0000000000012, Duration: 90.0 minutes)
