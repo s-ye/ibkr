@@ -61,14 +61,14 @@ if __name__ == "__main__":
 
 
     # Step 5: Save the formatted DataFrame to CSV
-    output_file = 'average_results.csv'
+    output_file = 'results/average_results.csv'
     average_results.to_csv(output_file, index=False)
 
     print(f"Formatted average results saved to {output_file}")
 
 
     # Save results for further analysis
-    results_df.to_csv("results.csv")
+    results_df.to_csv("results/results.csv")
 
     # process the results
     # for each start_date, I want to see the strategy and parameters that performed the best
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     top_3_per_start_date = top_3_per_start_date[['Start Date', 'Rank', 'Strategy Name', 'Parameters', 'Final Portfolio Value']]
 
     # Step 5: Export to CSV with specific formatting options
-    output_file = 'top_strategies_by_start_date.csv'
+    output_file = 'results/top_strategies_by_start_date.csv'
     top_3_per_start_date.to_csv(output_file, index=False, float_format='%.2f')
     print(f"Top 3 strategies per start date saved to {output_file}")
 
