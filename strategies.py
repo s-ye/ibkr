@@ -4,7 +4,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from stoploss_takeprofit_strategy import StopLossTakeProfitStrategy
 from datetime import time
-import yfinance as yf
 
 
 class SmaCrossoverStrategy(StopLossTakeProfitStrategy):

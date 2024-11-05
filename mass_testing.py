@@ -36,12 +36,12 @@ if __name__ == "__main__":
         'stop_loss_pct': [0.03]
     }
 
-    backtester = Backtester('CPNG', 'SMART', 'USD')
+    backtester = Backtester('AAPL', 'SMART', 'USD')
 
 
     # Run backtests with sampled periods and parameter grids
     results_df, average_results = backtester.run_sampled_backtests(
-        num_samples=10, duration_days=30, 
+        num_samples=100, duration_days=30, 
         sma_params=sma_params, bb_params=bb_params, sbb_params= sbb_params,
         drv_params=drv_params
     )
