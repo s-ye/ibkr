@@ -22,8 +22,8 @@ class GBMModel:
         self.data = historical_data
         self.model = None
         self.trace = None
-        self.fit()
-        self.plot_trace()
+        # self.fit()
+        # self.plot_trace()
         
 
     def fit(self):
@@ -81,42 +81,44 @@ class GBMModel:
         
         plt.tight_layout()
         plt.show()
+
+
+# # Main code
+# import pandas as pd
+# from datetime import datetime
+# from backtester import Backtester
+# import matplotlib.pyplot as plt
+
+# import matplotlib.dates as mdates
+
+# if __name__ == '__main__':
+#     # Load historical data
+#     backtester = Backtester('AAPL', 'SMART', 'USD')
+#     historical_data = backtester.full_data
+#     gbm = GBMModel(historical_data)
+
+#     # Simulate future prices
+#     simulations = gbm.simulate_future_prices(start_price=historical_data['close'].values[-1], time_periods=30,num_simulations=10)
+
+#     # Plot the last month of historical data
+#     plt.figure(figsize=(12, 6))
+#     plt.title('Historical Prices for AAPL')
+#     plt.xlabel('Time')
+#     plt.ylabel('Price')
+#     plt.legend()
+
+#     plt.plot(historical_data.index[-90:], historical_data['close'].values[-90:], color='blue', label='Historical Data')
+
+#     # Generate a timestamp range for future prices, starting from the last timestamp in historical data
+#     future_times = pd.date_range(start=historical_data.index[-1], periods=30, freq='15T')
     
-# Main code
-import pandas as pd
-from datetime import datetime
-from backtester import Backtester
-import matplotlib.pyplot as plt
+#     # Plot the simulations
+#     for i in range(simulations.shape[0]):
+#         plt.plot(future_times, simulations[i, :], color='red', alpha=0.5)
 
-import matplotlib.dates as mdates
-
-if __name__ == '__main__':
-    # Load historical data
-    backtester = Backtester('AAPL', 'SMART', 'USD')
-    historical_data = backtester.full_data
-    gbm = GBMModel(historical_data)
-
-    # Simulate future prices
-    simulations = gbm.simulate_future_prices(start_price=historical_data['close'].values[-1], time_periods=30,num_simulations=10)
-
-    # Plot the last month of historical data
-    plt.figure(figsize=(12, 6))
-    plt.title('Historical Prices for AAPL')
-    plt.xlabel('Time')
-    plt.ylabel('Price')
-    plt.legend()
-
-    plt.plot(historical_data.index[-90:], historical_data['close'].values[-90:], color='blue', label='Historical Data')
-
-    # Generate a timestamp range for future prices, starting from the last timestamp in historical data
-    future_times = pd.date_range(start=historical_data.index[-1], periods=30, freq='15T')
-    
-    # Plot the simulations
-    for i in range(simulations.shape[0]):
-        plt.plot(future_times, simulations[i, :], color='red', alpha=0.5)
-
-    plt.show()
+#     plt.show()
     
     
-    # Disconnect from IBKR
-    backtester.disconnect()
+#     # Disconnect from IBKR
+#     backtester.disconnect()
+

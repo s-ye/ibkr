@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import timedelta
 from itertools import product
 from ib_insync import IB, Stock, util
-from strategies import SmaCrossoverStrategy, BollingerBandsStrategy, DipRecoverVolumeStrategy, SidewaysBollingerBandsStrategy
+from strategies import *
 
 class Backtester:
     def __init__(self, stock_symbol, exchange, currency, client_id=1):
@@ -288,8 +288,6 @@ class Backtester:
             sbb_strategy.plot_trades()
 
 
-
-
     def run_drv_strategy(self, drv_params):
         for period, std_dev, take_profit_pct, stop_loss_pct in product(
             drv_params['period'],
@@ -318,3 +316,33 @@ class Backtester:
             print(stats)
 
             drv_strategy.plot_trades()
+
+    def run_gbm_strategy(self, gbm_params):
+        for threshold, time_periods, num_simulations, take_profit_pct, stop_loss_pct in product(
+            gbm_params['threshold'],
+            gbm_params['time_periods'],
+            gbm_params['num_simulations'],
+            gbm_params['take_profit_pct'],
+            gbm_params['stop_loss_pct']
+        ):
+            print(f"Running Geometric Brownian Motion Strategy with threshold={threshold}, time_periods={time_periods}, "
+                f"num_simulations={num_simulations}, take_profit_pct={take_profit_pct}, stop_loss_pct={stop_loss_pct}")
+
+
+            # Instantiate a new strategy instance
+            gbm_strategy = GBMStrategy(
+                self.stock, self.data, self.ib,
+                params={'threshold': threshold, 'time_periods': time_periods, 'num_simulations': num_simulations},
+                initial_capital=1_000_000,
+                profit_target_pct=take_profit_pct,
+                trailing_stop_pct=stop_loss_pct
+            )
+
+            # Run the backtest and gather results
+            gbm_strategy.backtest()
+            stats = gbm_strategy.trade_statistics()
+
+            # Append results with checks
+            print(stats)
+
+            gbm_strategy.plot_trades()

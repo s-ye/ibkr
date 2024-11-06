@@ -5,6 +5,7 @@ from ib_insync import IB, Stock, util
 from datetime import datetime
 import logging
 import os
+import matplotlib.dates as mdates
 
 # ignore future warnings
 import warnings
@@ -28,6 +29,8 @@ class BaseStrategy:
         self.avg_entry_price = 0  # Track average entry price
         self.entry_date = None  # Track the date when the current position was opened
         self.stats = None  # Store trade statistics
+        self.final_portfolio_value = None
+        self.sharpe_ratio = None
 
     def log_statistics_and_trades(self, statistics):
         # Format hyperparameters in filename
@@ -154,6 +157,16 @@ class BaseStrategy:
         df_trades['return'] = pd.to_numeric(df_trades['return'], errors='coerce')
         df_trades['duration'] = pd.to_numeric(df_trades['duration'], errors='coerce')
         
+        def calculate_sharpe(df_trades):
+            # Calculate daily returns
+            df_trades['daily_return'] = df_trades['return'] / (df_trades['duration'] / (60 * 24))
+            daily_returns = df_trades['daily_return']
+            
+            # Calculate Sharpe ratio
+            sharpe_ratio = np.sqrt(252) * daily_returns.mean() / daily_returns.std()
+            return sharpe_ratio
+
+        self.sharpe_ratio = calculate_sharpe(df_trades)
         # Calculate trade statistics
         stats = {
             'total_trades': len(df_trades),
@@ -162,25 +175,27 @@ class BaseStrategy:
             'average_return': df_trades['return'].mean(),
             'average_duration': df_trades['duration'].mean(),
             'final_balance': self.current_balance,
-            'final_portfolio_value': self.final_portfolio_value
+            'final_portfolio_value': self.final_portfolio_value,
+            'sharpe_ratio': self.sharpe_ratio
         }
 
         self.log_statistics_and_trades(stats)
         return stats
 
     def plot_trades(self, filename=None):
-        """Plot the close price with indicators and buy/sell signals for the specified strategy and save to a file."""
+        trading_hours_data = self.data_with_signals.between_time("09:30", "16:00")
+    
         # Set up the plot
         plt.figure(figsize=(14, 7))
-        plt.plot(self.data_with_signals['close'], label='Close Price', color='blue')
+        plt.plot(trading_hours_data['close'], label='Close Price', color='blue')
         self.plot_indicators()
 
         # Plot buy and sell signals based on signal changes
-        buys = self.data_with_signals[(self.data_with_signals['signal'] == 1) & (self.data_with_signals['signal'].shift(1) != 1)]
+        buys = trading_hours_data[(trading_hours_data['signal'] == 1) & (trading_hours_data['signal'].shift(1) != 1)]
         buy_dates = buys.index
         buy_prices = buys['close']
 
-        sells = self.data_with_signals[(self.data_with_signals['signal'] == -1) & (self.data_with_signals['signal'].shift(1) != 1)]
+        sells = trading_hours_data[(trading_hours_data['signal'] == -1) & (trading_hours_data['signal'].shift(1) != 1)]
         sell_dates = sells.index
         sell_prices = sells['close']
 
@@ -189,13 +204,22 @@ class BaseStrategy:
         if not sell_dates.empty:
             plt.plot(sell_dates, sell_prices, 'v', markersize=10, color='red', label='Sell Signal')
 
+        # Set date formatting to show only the hours within each day
+        ax = plt.gca()
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+        ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))
+        
+        # Rotate x-axis labels for better readability
+        plt.xticks(rotation=45)
+
         # Add title and labels
         param_str = "_".join([f"{k}{v}" for k, v in self.params.items()])
         plt.title(f"{self.stock.symbol} - {self.__class__.__name__} Strategy ({param_str})")
-        plt.xlabel('Date')
+        plt.xlabel('Time')
         plt.ylabel('Price')
         plt.legend()
 
+        # Save plot to the file with a dynamic filename based on final portfolio value
         final_value_str = f"{self.final_portfolio_value:.2f}" if self.final_portfolio_value is not None else "NA"
         filename = f"output/{final_value_str}_{self.__class__.__name__}_{param_str}.png"
 

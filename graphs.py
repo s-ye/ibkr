@@ -29,10 +29,18 @@ if __name__ == "__main__":
         'stop_loss_pct': [0.03]
     }
 
+    gbm_params = {
+        'threshold': [0.1,.5,1],
+        'time_periods': [3,15,30],
+        'num_simulations': [100],
+        'take_profit_pct': [0.05],
+        'stop_loss_pct': [0.03]
+    }
 
-    backtester = Backtester('CPNG', 'SMART', 'USD')
+    backtester = Backtester('MRNA', 'SMART', 'USD')
     # backtester.run_sma_strategy(sma_params)
     # backtester.run_bb_strategy(bb_params)
     # backtester.run_sbb_strategy(sbb_params)
-    backtester.run_drv_strategy(drv_params)
+    # backtester.run_drv_strategy(drv_params)
+    backtester.run_gbm_strategy(gbm_params)
     backtester.disconnect()
