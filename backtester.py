@@ -35,32 +35,31 @@ class Backtester:
         df.to_csv(cache_file)
         return df
 
-    def run_sampled_backtests(self, num_samples=10, duration_days=30, sma_params=None, bb_params=None,sbb_params = None, drv_params=None):
+    def run_sampled_backtests(self, num_samples=100, duration_days=30,gbm_params=None):
         results = []
-        
         for _ in range(num_samples):
             sample_data = self._get_random_sample(duration_days)
-            
-            # Run SMA Crossover Strategy with different parameter combinations
-            if sma_params:
-                for fast_period, slow_period, take_profit_pct, stop_loss_pct in product(
-                        sma_params['fast_period'],
-                        sma_params['slow_period'],
-                        sma_params['take_profit_pct'],
-                        sma_params['stop_loss_pct']
+            if gbm_params:
+                for threshold, time_periods, num_simulations, take_profit_pct, stop_loss_pct in product(
+                        gbm_params['threshold'],
+                        gbm_params['time_periods'],
+                        gbm_params['num_simulations'],
+                        gbm_params['take_profit_pct'],
+                        gbm_params['stop_loss_pct']
                     ):
-                    sma_strategy = SmaCrossoverStrategy(
+                    gbm_strategy = GBMStrategy(
                         self.stock, sample_data, self.ib,
-                        params={'fast_period': fast_period, 'slow_period': slow_period},
+                        params={'threshold': threshold, 'time_periods': time_periods, 'num_simulations': num_simulations},
                         initial_capital=1_000_000,
                         profit_target_pct=take_profit_pct,
                         trailing_stop_pct=stop_loss_pct
                     )
-                    sma_strategy.backtest()
-                    stats = sma_strategy.trade_statistics()
+                    gbm_strategy.backtest()
+                    gbm_strategy.plot_trades()
+                    stats = gbm_strategy.trade_statistics()
                     results.append({
-                        'strategy': 'SMA_Crossover',
-                        'params': {'fast_period': fast_period, 'slow_period': slow_period, 
+                        'strategy': 'Geometric_Brownian_Motion',
+                        'params': {'threshold': threshold, 'time_periods': time_periods, 'num_simulations': num_simulations,
                                    'take_profit_pct': take_profit_pct, 'stop_loss_pct': stop_loss_pct},
                         'start_date': sample_data.index[0],
                         'end_date': sample_data.index[-1],
@@ -69,95 +68,7 @@ class Backtester:
                         'winning_trades': stats['winning_trades'],
                         'losing_trades': stats['losing_trades'],
                         'average_return': stats['average_return'],
-                    })
-
-            # Run Bollinger Bands Strategy with different parameter combinations
-            if bb_params:
-                for period, std_dev, take_profit_pct, stop_loss_pct in product(
-                        bb_params['period'],
-                        bb_params['std_dev'],
-                        bb_params['take_profit_pct'],
-                        bb_params['stop_loss_pct']
-                    ):
-                    bb_strategy = BollingerBandsStrategy(
-                        self.stock, sample_data, self.ib,
-                        params={'period': period, 'std_dev': std_dev},
-                        initial_capital=1_000_000,
-                        profit_target_pct=take_profit_pct,
-                        trailing_stop_pct=stop_loss_pct
-                    )
-                    bb_strategy.backtest()
-                    stats = bb_strategy.trade_statistics()
-                    results.append({
-                        'strategy': 'Bollinger_Bands',
-                        'params': {'period': period, 'std_dev': std_dev, 
-                                   'take_profit_pct': take_profit_pct, 'stop_loss_pct': stop_loss_pct},
-                        'start_date': sample_data.index[0],
-                        'end_date': sample_data.index[-1],
-                        'final_portfolio_value': stats['final_portfolio_value'],
-                        'total_trades': stats['total_trades'],
-                        'winning_trades': stats['winning_trades'],
-                        'losing_trades': stats['losing_trades'],
-                        'average_return': stats['average_return'],
-                    })
-            if sbb_params:
-                for period, std_dev, rsi_window, take_profit_pct, stop_loss_pct in product(
-                        sbb_params['period'],
-                        sbb_params['std_dev'],
-                        sbb_params['rsi_window'],
-                        sbb_params['take_profit_pct'],
-                        sbb_params['stop_loss_pct']
-                    ):
-                    sbb_strategy = SidewaysBollingerBandsStrategy(
-                        self.stock, sample_data, self.ib,
-                        params={'period': period, 'std_dev': std_dev, 'rsi_window': rsi_window},
-                        initial_capital=1_000_000,
-                        profit_target_pct=take_profit_pct,
-                        trailing_stop_pct=stop_loss_pct
-                    )
-                    sbb_strategy.backtest()
-                    stats = sbb_strategy.trade_statistics()
-                    results.append({
-                        'strategy': 'Sideways_Bollinger_Bands',
-                        'params': {'period': period, 'std_dev': std_dev, 'rsi_window': rsi_window,
-                                   'take_profit_pct': take_profit_pct, 'stop_loss_pct': stop_loss_pct},
-                        'start_date': sample_data.index[0],
-                        'end_date': sample_data.index[-1],
-                        'final_portfolio_value': stats['final_portfolio_value'],
-                        'total_trades': stats['total_trades'],
-                        'winning_trades': stats['winning_trades'],
-                        'losing_trades': stats['losing_trades'],
-                        'average_return': stats['average_return'],
-                    })
-
-            # Run Morning Dip Afternoon Recovery Strategy with different parameter combinations
-            if drv_params:
-                for period, std_dev, take_profit_pct, stop_loss_pct in product(
-                        drv_params['period'],
-                        drv_params['std_dev'],
-                        drv_params['take_profit_pct'],
-                        drv_params['stop_loss_pct']
-                    ):
-                    drv_strategy = DipRecoverVolumeStrategy(
-                        self.stock, sample_data, self.ib,
-                        params={'period': period, 'std_dev': std_dev},
-                        initial_capital=1_000_000,
-                        profit_target_pct=take_profit_pct,
-                        trailing_stop_pct=stop_loss_pct
-                    )
-                    drv_strategy.backtest()
-                    stats = drv_strategy.trade_statistics()
-                    results.append({
-                        'strategy': 'Dip_Recovery_Volume',
-                        'params': {'period': period, 'std_dev': std_dev, 
-                                   'take_profit_pct': take_profit_pct, 'stop_loss_pct': stop_loss_pct},
-                        'start_date': sample_data.index[0],
-                        'end_date': sample_data.index[-1],
-                        'final_portfolio_value': stats['final_portfolio_value'],
-                        'total_trades': stats['total_trades'],
-                        'winning_trades': stats['winning_trades'],
-                        'losing_trades': stats['losing_trades'],
-                        'average_return': stats['average_return'],
+                        'sharpe_ratio': stats['sharpe_ratio'],
                     })
                 
 
@@ -219,103 +130,6 @@ class Backtester:
         # index by date
         df.set_index('date', inplace=True)
         return df
-
-    def run_sma_strategy(self, sma_params):
-        for fast_period, slow_period, take_profit_pct, stop_loss_pct in product(
-                sma_params['fast_period'],
-                sma_params['slow_period'],
-                sma_params['take_profit_pct'],
-                sma_params['stop_loss_pct']
-            ):
-            print(f"\nRunning SMA Crossover Strategy with fast_period={fast_period}, slow_period={slow_period}, "
-                  f"take_profit_pct={take_profit_pct}, stop_loss_pct={stop_loss_pct}")
-            sma_strategy = SmaCrossoverStrategy(
-                self.stock, self.data, self.ib,
-                params={'fast_period': fast_period, 'slow_period': slow_period},
-                initial_capital=1_000_000,
-                profit_target_pct=take_profit_pct,
-                trailing_stop_pct=stop_loss_pct
-            )
-            sma_strategy.backtest()
-            stats = sma_strategy.trade_statistics()
-            print(stats)
-            sma_strategy.plot_trades()
-            
-
-    def run_bb_strategy(self, bb_params):
-        for period, std_dev, take_profit_pct, stop_loss_pct in product(
-                bb_params['period'],
-                bb_params['std_dev'],
-                bb_params['take_profit_pct'],
-                bb_params['stop_loss_pct']
-            ):
-            print(f"\nRunning Bollinger Bands Strategy with period={period}, std_dev={std_dev}, "
-                  f"take_profit_pct={take_profit_pct}, stop_loss_pct={stop_loss_pct}")
-            bb_strategy = BollingerBandsStrategy(
-                self.stock, self.data, self.ib,
-                params={'period': period, 'std_dev': std_dev},
-                initial_capital=1_000_000,
-                profit_target_pct=take_profit_pct,
-                trailing_stop_pct=stop_loss_pct
-            )
-            bb_strategy.backtest()
-            stats = bb_strategy.trade_statistics()
-            print(stats)
-            bb_strategy.plot_trades()
-
-    def run_sbb_strategy(self, sbb_params):
-        for period, std_dev, rsi_window, take_profit_pct, stop_loss_pct in product(
-                sbb_params['period'],
-                sbb_params['std_dev'],
-                sbb_params['rsi_window'],
-                sbb_params['take_profit_pct'],
-                sbb_params['stop_loss_pct']
-            ):
-            print(f"\nRunning Sideways Bollinger Bands Strategy with period={period}, std_dev={std_dev}, rsi_window={rsi_window}, "
-                  f"take_profit_pct={take_profit_pct}, stop_loss_pct={stop_loss_pct}")
-            sbb_strategy = SidewaysBollingerBandsStrategy(
-                self.stock, self.data, self.ib,
-                params={'period': period, 'std_dev': std_dev, 'rsi_window': rsi_window},
-                initial_capital=1_000_000,
-                profit_target_pct=take_profit_pct,
-                trailing_stop_pct=stop_loss_pct
-            )
-            sbb_strategy.backtest()
-            stats = sbb_strategy.trade_statistics()
-            print(stats)
-
-
-            sbb_strategy.plot_trades()
-
-
-    def run_drv_strategy(self, drv_params):
-        for period, std_dev, take_profit_pct, stop_loss_pct in product(
-            drv_params['period'],
-            drv_params['std_dev'],
-            drv_params['take_profit_pct'],
-            drv_params['stop_loss_pct']
-        ):
-            print(f"Running Dip Recovery Volume Strategy with period={period}, std_dev={std_dev}, "
-                f"take_profit_pct={take_profit_pct}, stop_loss_pct={stop_loss_pct}")
-
-
-            # Instantiate a new strategy instance
-            drv_strategy = DipRecoverVolumeStrategy(
-                self.stock, self.data, self.ib,
-                params={'period': period, 'std_dev': std_dev},
-                initial_capital=1_000_000,
-                profit_target_pct=take_profit_pct,
-                trailing_stop_pct=stop_loss_pct
-            )
-
-            # Run the backtest and gather results
-            drv_strategy.backtest()
-            stats = drv_strategy.trade_statistics()
-
-            # Append results with checks
-            print(stats)
-
-            drv_strategy.plot_trades()
 
     def run_gbm_strategy(self, gbm_params):
         for threshold, time_periods, num_simulations, take_profit_pct, stop_loss_pct in product(

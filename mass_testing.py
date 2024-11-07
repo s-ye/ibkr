@@ -2,48 +2,20 @@ from backtester import Backtester
 
     # Example usage
 if __name__ == "__main__":
-    sma_params = {
-        'fast_period': [5, 10, 15],
-        'slow_period': [20, 30, 40],
-        # 'take_profit_pct': [0.05, 0.1],
-        # 'stop_loss_pct': [0.03, 0.05]
-        'take_profit_pct': [0.05],
-        'stop_loss_pct': [0.03]
-
-    }
-
-    bb_params = {
-        'period': [15, 20, 25],
-        'std_dev': [1, 1.5, 2, 2.5],
-        # 'take_profit_pct': [0.05, 0.1],
-        # 'stop_loss_pct': [0.03, 0.05]
+    gbm_params = {
+        'threshold': [0.1, 0.2, 0.5],
+        'time_periods': [30],
+        'num_simulations': [150],
         'take_profit_pct': [0.05],
         'stop_loss_pct': [0.03]
     }
 
-    sbb_params = {
-        'period': [10, 15, 20],
-        'std_dev': [0.5, 1],
-        'rsi_window': [14, 21, 28],
-        'take_profit_pct': [0.05],
-        'stop_loss_pct': [0.03]
-    }
-
-    drv_params = {
-        'period': [10, 15, 20],
-        'std_dev': [0.5, 1],
-        'take_profit_pct': [0.05],
-        'stop_loss_pct': [0.03]
-    }
-
-    backtester = Backtester('AAPL', 'SMART', 'USD')
+    backtester = Backtester('MRNA', 'SMART', 'USD')
 
 
     # Run backtests with sampled periods and parameter grids
     results_df, average_results = backtester.run_sampled_backtests(
-        num_samples=100, duration_days=30, 
-        sma_params=sma_params, bb_params=bb_params, sbb_params= sbb_params,
-        drv_params=drv_params
+        num_samples=3, duration_days=30, gbm_params=gbm_params
     )
 
 

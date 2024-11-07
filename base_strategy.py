@@ -158,13 +158,29 @@ class BaseStrategy:
         df_trades['duration'] = pd.to_numeric(df_trades['duration'], errors='coerce')
         
         def calculate_sharpe(df_trades):
-            # Calculate daily returns
+            """
+            Calculate the Sharpe Ratio from trade returns, assuming duration is in minutes.
+            """
+            # Filter out trades with very short durations (e.g., <1 minute) to avoid division by very small numbers
+            df_trades = df_trades[df_trades['duration'] > 1]
+
+            # Calculate daily returns, making sure 'duration' is in minutes
             df_trades['daily_return'] = df_trades['return'] / (df_trades['duration'] / (60 * 24))
             daily_returns = df_trades['daily_return']
-            
-            # Calculate Sharpe ratio
-            sharpe_ratio = np.sqrt(252) * daily_returns.mean() / daily_returns.std()
+
+            # Debugging: Print mean and standard deviation of daily returns
+            print(f"Mean daily return: {daily_returns.mean()}")
+            print(f"Standard deviation of daily returns: {daily_returns.std()}")
+
+            # Calculate Sharpe Ratio, using np.sqrt(252) to annualize
+            if daily_returns.std() != 0:
+                sharpe_ratio = np.sqrt(252) * daily_returns.mean() / daily_returns.std()
+            else:
+                print("Standard deviation of daily returns is zero, setting Sharpe Ratio to 0.")
+                sharpe_ratio = 0  # Avoid division by zero if standard deviation is zero
+
             return sharpe_ratio
+
 
         self.sharpe_ratio = calculate_sharpe(df_trades)
         # Calculate trade statistics

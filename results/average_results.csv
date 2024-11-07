@@ -1,46 +1,4 @@
 strategy,params,Final Portfolio Value
-Bollinger_Bands,"{'period': 15, 'std_dev': 1.5, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1011089.87
-Bollinger_Bands,"{'period': 20, 'std_dev': 1.5, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1010313.4
-Dip_Recovery_Volume,"{'period': 20, 'std_dev': 0.5, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1008971.71
-Dip_Recovery_Volume,"{'period': 10, 'std_dev': 0.5, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1008922.43
-Dip_Recovery_Volume,"{'period': 10, 'std_dev': 1, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1008527.04
-Bollinger_Bands,"{'period': 20, 'std_dev': 1, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1008383.49
-Bollinger_Bands,"{'period': 25, 'std_dev': 1, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1007704.96
-Bollinger_Bands,"{'period': 25, 'std_dev': 2, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1007508.68
-Bollinger_Bands,"{'period': 25, 'std_dev': 1.5, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1007403.15
-Bollinger_Bands,"{'period': 15, 'std_dev': 1, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1006992.01
-Bollinger_Bands,"{'period': 20, 'std_dev': 2, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1006666.25
-Bollinger_Bands,"{'period': 15, 'std_dev': 2, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1006566.13
-Bollinger_Bands,"{'period': 15, 'std_dev': 2.5, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1006359.42
-Dip_Recovery_Volume,"{'period': 20, 'std_dev': 1, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1005839.59
-Dip_Recovery_Volume,"{'period': 15, 'std_dev': 0.5, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1005832.34
-Bollinger_Bands,"{'period': 20, 'std_dev': 2.5, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1004638.95
-Dip_Recovery_Volume,"{'period': 15, 'std_dev': 1, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1004446.4
-SMA_Crossover,"{'fast_period': 15, 'slow_period': 30, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1002913.44
-Bollinger_Bands,"{'period': 25, 'std_dev': 2.5, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1002695.76
-SMA_Crossover,"{'fast_period': 10, 'slow_period': 30, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1002154.31
-Sideways_Bollinger_Bands,"{'period': 10, 'std_dev': 1, 'rsi_window': 14, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1001635.45
-SMA_Crossover,"{'fast_period': 10, 'slow_period': 40, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1001630.03
-SMA_Crossover,"{'fast_period': 5, 'slow_period': 40, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1001540.16
-Sideways_Bollinger_Bands,"{'period': 15, 'std_dev': 1, 'rsi_window': 28, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1001349.06
-SMA_Crossover,"{'fast_period': 15, 'slow_period': 40, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1001194.24
-Sideways_Bollinger_Bands,"{'period': 10, 'std_dev': 1, 'rsi_window': 28, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1001157.61
-Sideways_Bollinger_Bands,"{'period': 10, 'std_dev': 1, 'rsi_window': 21, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000941.43
-Sideways_Bollinger_Bands,"{'period': 10, 'std_dev': 0.5, 'rsi_window': 14, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000911.33
-SMA_Crossover,"{'fast_period': 5, 'slow_period': 30, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000905.44
-Sideways_Bollinger_Bands,"{'period': 20, 'std_dev': 1, 'rsi_window': 14, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000878.79
-Sideways_Bollinger_Bands,"{'period': 10, 'std_dev': 0.5, 'rsi_window': 28, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000751.19
-Sideways_Bollinger_Bands,"{'period': 10, 'std_dev': 0.5, 'rsi_window': 21, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000750.62
-Sideways_Bollinger_Bands,"{'period': 15, 'std_dev': 1, 'rsi_window': 21, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000738.09
-SMA_Crossover,"{'fast_period': 15, 'slow_period': 20, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000696.16
-Sideways_Bollinger_Bands,"{'period': 15, 'std_dev': 1, 'rsi_window': 14, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000690.01
-Sideways_Bollinger_Bands,"{'period': 20, 'std_dev': 1, 'rsi_window': 28, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000497.88
-Sideways_Bollinger_Bands,"{'period': 15, 'std_dev': 0.5, 'rsi_window': 28, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000392.44
-Sideways_Bollinger_Bands,"{'period': 20, 'std_dev': 0.5, 'rsi_window': 28, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000239.69
-SMA_Crossover,"{'fast_period': 10, 'slow_period': 20, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000159.57
-Sideways_Bollinger_Bands,"{'period': 20, 'std_dev': 1, 'rsi_window': 21, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000154.97
-SMA_Crossover,"{'fast_period': 5, 'slow_period': 20, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000085.67
-Sideways_Bollinger_Bands,"{'period': 15, 'std_dev': 0.5, 'rsi_window': 14, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000033.91
-Sideways_Bollinger_Bands,"{'period': 15, 'std_dev': 0.5, 'rsi_window': 21, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1000022.14
-Sideways_Bollinger_Bands,"{'period': 20, 'std_dev': 0.5, 'rsi_window': 14, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",999846.8
-Sideways_Bollinger_Bands,"{'period': 20, 'std_dev': 0.5, 'rsi_window': 21, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",999699.14
+Geometric_Brownian_Motion,"{'threshold': 0.5, 'time_periods': 60, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1001981.45
+Geometric_Brownian_Motion,"{'threshold': 0.2, 'time_periods': 60, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1001759.1
+Geometric_Brownian_Motion,"{'threshold': 0.1, 'time_periods': 60, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1001122.48
