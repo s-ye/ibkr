@@ -1,9 +1,14 @@
+# Standard library imports
 import os
 import random
-import pandas as pd
 from datetime import timedelta
 from itertools import product
+
+from strategies import GBMStrategy
+import pandas as pd
 from ib_insync import IB, Stock, util
+
+# Local imports
 from strategies import *
 
 class Backtester:
@@ -13,7 +18,12 @@ class Backtester:
         self.stock = Stock(stock_symbol, exchange, currency)
         self.ib.qualifyContracts(self.stock)
         self.full_data = self._get_full_historical_data(stock_symbol)
+        # Ensure cache directory exists
+        if not os.path.exists('cache'):
+            os.makedirs('cache')
         self.data = self._get_historical_data(stock_symbol)
+        self.disconnect()
+
 
     def _get_full_historical_data(self, stock_symbol):
         cache_file = f"cache/{stock_symbol}_2year_15min_data.csv"
@@ -32,6 +42,9 @@ class Backtester:
         )
         df = util.df(bars)
         df.set_index('date', inplace=True)
+        # Ensure cache directory exists
+        if not os.path.exists('cache'):
+            os.makedirs('cache')
         df.to_csv(cache_file)
         return df
 
@@ -91,16 +104,15 @@ class Backtester:
         
         return results_df, average_results
 
-
-
-
     def _get_random_sample(self, duration_days):
-        """Get a random 1-month (or custom duration) sample from the 3-year dataset."""
+        """Get a random 1-month (or custom duration) sample from the 2-year dataset."""
         total_bars = len(self.full_data)
         bars_per_day = int(timedelta(days=1) / timedelta(minutes=15))  # 96 bars for 15-min intervals
         sample_size = bars_per_day * duration_days
         
         # Select a random start index that allows for a full sample within bounds
+        if sample_size > total_bars:
+            raise ValueError("Sample size is larger than the total available data.")
         start_idx = random.randint(0, total_bars - sample_size)
         sample_data = self.full_data.iloc[start_idx:start_idx + sample_size].copy()
         

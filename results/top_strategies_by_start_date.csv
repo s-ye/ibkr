@@ -1,10 +1,5 @@
 Start Date,Rank,Strategy Name,Parameters,Final Portfolio Value
-2023-03-09 12:00:00-05:00,1,Geometric_Brownian_Motion,"{'threshold': 0.1, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",1005422.51
-2023-03-09 12:00:00-05:00,2,Geometric_Brownian_Motion,"{'threshold': 0.2, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",999822.81
-2023-03-09 12:00:00-05:00,3,Geometric_Brownian_Motion,"{'threshold': 0.5, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",998478.19
-2023-09-18 12:15:00-04:00,1,Geometric_Brownian_Motion,"{'threshold': 0.1, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",993805.60
-2023-09-18 12:15:00-04:00,2,Geometric_Brownian_Motion,"{'threshold': 0.5, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",987781.33
-2023-09-18 12:15:00-04:00,3,Geometric_Brownian_Motion,"{'threshold': 0.2, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",986632.27
-2023-11-14 12:00:00-05:00,1,Geometric_Brownian_Motion,"{'threshold': 0.2, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",999092.68
-2023-11-14 12:00:00-05:00,2,Geometric_Brownian_Motion,"{'threshold': 0.5, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",997208.68
-2023-11-14 12:00:00-05:00,3,Geometric_Brownian_Motion,"{'threshold': 0.1, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.03}",996435.32
+2023-09-07 11:45:00-04:00,1,Geometric_Brownian_Motion,"{'threshold': 0.5, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.05}",981825.78
+2023-09-07 11:45:00-04:00,2,Geometric_Brownian_Motion,"{'threshold': 1, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.05}",979806.28
+2024-05-30 11:30:00-04:00,1,Geometric_Brownian_Motion,"{'threshold': 1, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.05}",986031.13
+2024-05-30 11:30:00-04:00,2,Geometric_Brownian_Motion,"{'threshold': 0.5, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.05}",979816.24
