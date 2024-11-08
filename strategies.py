@@ -97,3 +97,5 @@ class GBMStrategy(StopLossTakeProfitStrategy):
         plt.plot(self.data.index, expected_prices, label="Expected Price", color="purple", linestyle="--")
         plt.plot(self.data.index, buy_thresholds, label="Buy Threshold", color="green", linestyle="--")
         plt.plot(self.data.index, sell_thresholds, label="Sell Threshold", color="red", linestyle="--")
+
+# introduce GBM with Volume data
