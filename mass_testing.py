@@ -4,7 +4,7 @@ from backtester import Backtester
 if __name__ == "__main__":
     gbm_params = {
         'threshold': [0.5,1],
-        'time_periods': [30],
+        'time_periods': [60],
         'num_simulations': [150],
         'take_profit_pct': [0.05],
         'stop_loss_pct': [0.05]

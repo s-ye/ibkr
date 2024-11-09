@@ -32,12 +32,16 @@ train_data = mrna_data[(mrna_data.index >= train_start_date) & (mrna_data.index 
 test_data = mrna_data[(mrna_data.index >= test_start_date) & (mrna_data.index <= test_end_date)]
 
 # Define hyperparameter ranges for grid search
+# mu_means = [0.001, 0.005, 0.01, .02, 0.05]
+# mu_stds = [0.01, 0.02, 0.05, 0.1]
+# sigma_scales = [0.01, 0.05, 0.1, 0.2, 0.5, 1,2]
+
 mu_means = [0.001, 0.005, 0.01]
-mu_stds = [0.01, 0.02]
-sigma_scales = [0.01, 0.05, 0.1]
-num_samples = [1000, 2000]
-burn_in_periods = [500, 1000]
-chains = [2, 4]
+mu_stds = [0.01, 0.02,.01]
+sigma_scales = [0.01, 0.05]
+num_samples = [2000]
+burn_in_periods = [1000]
+chains = [6]
 
 # Initialize GBMGridSearch with the training data
 grid_search = GBMGridSearch(

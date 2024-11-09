@@ -24,6 +24,10 @@ class GBMModel:
         self.data = historical_data
         self.model = None
         self.trace = None
+        self.mu_mean = .01
+        self.mu_std = .1
+        self.sigma_scale = .1
+        self.chain = 6
         
 
     def fit(self):
@@ -31,14 +35,14 @@ class GBMModel:
         
         with pm.Model() as self.model:
             # Priors for mu and sigma
-            mu = pm.Normal('mu', mu=0, sigma=1)
-            sigma = pm.HalfNormal('sigma', sigma=1)
+            mu = pm.Normal('mu', mu=self.mu_mean, sigma=self.mu_std)
+            sigma = pm.HalfNormal('sigma', sigma=self.sigma_scale)
             
             # Likelihood of observed returns
             likelihood = pm.Normal('returns', mu=mu, sigma=sigma, observed=returns)
             
             # MCMC sampling
-            self.trace = pm.sample(2000, tune=1000, target_accept=0.9)
+            self.trace = pm.sample(2000, tune=1000, target_accept=0.9, chains=self.chain)
 
     def simulate_future_prices(self, start_price, time_periods, num_simulations=100):
         simulations = np.zeros((num_simulations, time_periods))
@@ -49,7 +53,9 @@ class GBMModel:
             prices = [start_price]
             
             for t in range(1, time_periods):
-                dt = 1
+                # 26 bars in a day
+                dt = 1/26 
+
                 next_price = prices[-1] * np.exp((mu_sample - 0.5 * sigma_sample**2) * dt +
                                                  sigma_sample * np.sqrt(dt) * np.random.normal())
                 prices.append(next_price)
@@ -110,7 +116,7 @@ class GBMGridSearch:
             trace = pm.sample(num_sample, tune=burn_in, target_accept=0.9, chains=chain)
             return trace
 
-    def calculate_predictive_accuracy(self, trace, start_price, actual_prices, time_periods, num_simulations=100):
+    def calculate_predictive_accuracy(self, trace, start_price, actual_prices, time_periods, num_simulations=150):
         """
         Calculate predictive accuracy metrics for the model.
         
@@ -133,7 +139,7 @@ class GBMGridSearch:
             prices = [start_price]
             
             for t in range(1, time_periods):
-                dt = 1
+                dt = 1/26
                 next_price = prices[-1] * np.exp((mu_sample - 0.5 * sigma_sample**2) * dt +
                                                  sigma_sample * np.sqrt(dt) * np.random.normal())
                 prices.append(next_price)
@@ -177,3 +183,13 @@ class GBMGridSearch:
         results_df = pd.DataFrame(self.results)
         results_df.to_csv("results/grid_search_results.csv")
         print("Grid search results saved to 'results/grid_search_results.csv'")
+
+        # save the 3 results with the lowest MAE and RMSE
+        best_results_1 = results_df.nsmallest(3, ['MAE'])
+        best_results_1.to_csv("results/best_results.csv")
+        best_results_2 = results_df.nsmallest(3, ['RMSE'])
+        best_results_2.to_csv("results/best_results.csv", mode='a', header=False)
+
+        print("Best results saved to 'results/best_results.csv'")
+
+
