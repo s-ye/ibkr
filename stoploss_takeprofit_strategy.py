@@ -24,10 +24,10 @@ class StopLossTakeProfitStrategy(BaseStrategy):
 
     # existing methods like _execute_trades, _should_buy, etc.
     def _should_buy(self, i):
-        return self.data_with_signals['signal'].iloc[i] == 1 and self.data_with_signals['signal'].iloc[i - 1] != 1
+        return self.data_with_signals['signal'].iloc[i] == 1 
 
     def _should_sell(self, i):
-        return self.data_with_signals['signal'].iloc[i] == -1 and self.data_with_signals['signal'].iloc[i - 1] != -1
+        return self.data_with_signals['signal'].iloc[i] == -1 
 
     def plot_trades(self, filename=None):
         """Plot close price with indicators, buy signals, profit-taking, and stop-loss exits."""
@@ -117,8 +117,12 @@ class StopLossTakeProfitStrategy(BaseStrategy):
             portfolio_value = self.current_balance + (self.current_position * current_price)
             self.portfolio_values.append({'date': self.data_with_signals.index[i], 'portfolio_value': portfolio_value})
 
-            
-            if self.current_position >= 0:
+            if self.current_position == 0:
+                if self._should_buy(i):
+                    self._buy_position(current_price, i)
+                elif self._should_sell(i):
+                    self._sell_position_short(current_price, i)
+            elif self.current_position > 0:
                 if self._should_buy(i):
                     self._buy_position(current_price, i)
                 if self._should_sell(i):
@@ -127,8 +131,7 @@ class StopLossTakeProfitStrategy(BaseStrategy):
                     self._sell_position(current_price, i, 'profit_take')
                 elif self._hit_trailing_stop(current_price):
                     self._sell_position(current_price, i, 'stop_loss')
-            
-            if self.current_position <= 0:
+            elif self.current_position < 0:
                 if self._should_sell(i):
                     self._sell_position_short(current_price, i)
                 if self._should_buy(i):
@@ -159,10 +162,10 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         if shares_to_buy > 0 and buy_cost <= self.current_balance:
             self.avg_entry_price = ((self.avg_entry_price * self.current_position) + (current_price * shares_to_buy)) / (self.current_position + shares_to_buy)
             self.current_balance -= buy_cost
+            self.entry_date = self.data_with_signals.index[index] if self.current_position == 0 else self.entry_date
             self.current_position += shares_to_buy
-            self.entry_date = self.data_with_signals.index[index]
             self.highest_price_since_entry = current_price
-            self.logger.info(f"Long Buy {shares_to_buy:.2f} shares at {current_price} on {self.entry_date}")
+            self.logger.info(f"Long Buy {shares_to_buy:.2f} shares at {current_price} on {self.data_with_signals.index[index]}")
 
     def _sell_position(self, current_price, index, exit_type):
         """Helper method to execute a sell operation and log the type of exit."""
@@ -202,12 +205,12 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         shares_to_sell = (self.current_balance * self.position_size_pct) // current_price
         sell_revenue = shares_to_sell * current_price
         if shares_to_sell > 0:
-            self.avg_entry_price = ((self.avg_entry_price * self.current_position) + (current_price * shares_to_sell)) / (self.current_position + shares_to_sell)
+            self.avg_entry_price = ((self.avg_entry_price * abs(self.current_position)) + (current_price * shares_to_sell)) / (abs(self.current_position) + shares_to_sell)
             self.current_balance += sell_revenue
+            self.entry_date = self.data_with_signals.index[index] if self.current_position == 0 else self.entry_date
             self.current_position -= shares_to_sell
-            self.entry_date = self.data_with_signals.index[index]
             self.lowest_price_since_entry = current_price
-            self.logger.info(f"Short Sell {shares_to_sell:.2f} shares at {current_price} on {self.entry_date}")
+            self.logger.info(f"Short Sell {shares_to_sell:.2f} shares at {current_price} on {self.data_with_signals.index[index]}")
 
     def _buy_position_short(self, current_price, index,exit_type):
         """Execute a buy to cover operation."""
@@ -308,6 +311,8 @@ class StopLossTakeProfitStrategy(BaseStrategy):
 
     def _hit_profit_target(self, current_price):
         """Check if the profit target is met."""
+        if self.avg_entry_price == 0:
+            return False
         return (current_price - self.avg_entry_price) / self.avg_entry_price >= self.profit_target_pct
 
     def _hit_trailing_stop(self, current_price):
@@ -318,6 +323,8 @@ class StopLossTakeProfitStrategy(BaseStrategy):
     
     def _hit_profit_target_short(self, current_price):
         """Check if the profit target is met."""
+        if self.avg_entry_price == 0:
+            return False
         return (self.avg_entry_price - current_price) / self.avg_entry_price >= self.profit_target_pct
     
     def _hit_trailing_stop_short(self, current_price):
@@ -356,17 +363,22 @@ class StopLossTakeProfitStrategy(BaseStrategy):
 
         # Check buy signal and place paper trade if signal changes to 1
         # Check sell signal and place paper trade if signal changes to -1
-        if self.current_position >= 0:
+        if self.current_position == 0:
+            if self._should_buy(-1):
+                self.paper_trade_buy_long(latest_price)
+            elif self._should_sell(-1):
+                self.paper_trade_sell_close(latest_price, 'signal')
+        elif self.current_position > 0:
             if self._should_buy(-1):
                 self.paper_trade_buy_long(latest_price)
             if self._should_sell(-1):
-                self.paper_trade_sell(latest_price, 'signal')
+                self.paper_trade_sell_close(latest_price, 'signal')
             elif self._hit_profit_target(latest_price):
-                self.paper_trade_sell(latest_price, 'profit_take')
+                self.paper_trade_sell_close(latest_price, 'profit_take')
             elif self._hit_trailing_stop(latest_price):
-                self.paper_trade_sell(latest_price, 'stop_loss')
+                self.paper_trade_sell_close(latest_price, 'stop_loss')
 
-        elif self.current_position <= 0:
+        elif self.current_position < 0:
             if self._should_sell(-1):
                 self.paper_trade_sell_short(latest_price, 'signal')
             if self._should_buy(-1):
