@@ -52,6 +52,7 @@ class Backtester:
         results = []
         for _ in range(num_samples):
             sample_data = self._get_random_sample(duration_days)
+            print(sample_data)
             if gbm_params:
                 for threshold, time_periods, num_simulations, take_profit_pct, stop_loss_pct in product(
                         gbm_params['threshold'],
@@ -107,7 +108,8 @@ class Backtester:
     def _get_random_sample(self, duration_days):
         """Get a random 1-month (or custom duration) sample from the 2-year dataset."""
         total_bars = len(self.full_data)
-        bars_per_day = int(timedelta(days=1) / timedelta(minutes=15))  # 96 bars for 15-min intervals
+        # bars_per_day based on 930am-4pm trading hours
+        bars_per_day = 26
         sample_size = bars_per_day * duration_days
         
         # Select a random start index that allows for a full sample within bounds

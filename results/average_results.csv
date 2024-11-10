@@ -1,3 +1,9 @@
 strategy,params,Final Portfolio Value
-Geometric_Brownian_Motion,"{'threshold': 1, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.05}",982918.7
-Geometric_Brownian_Motion,"{'threshold': 0.5, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.05}",980821.01
+Geometric_Brownian_Motion,"{'threshold': 1, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.05}",1323307.47
+Geometric_Brownian_Motion,"{'threshold': 0.2, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.05}",1251974.82
+Geometric_Brownian_Motion,"{'threshold': 0.1, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.05}",1249500.55
+Geometric_Brownian_Motion,"{'threshold': 0.5, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.05}",1228535.42
+Geometric_Brownian_Motion,"{'threshold': 1, 'time_periods': 15, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.05}",1030723.68
+Geometric_Brownian_Motion,"{'threshold': 0.2, 'time_periods': 15, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.05}",1006044.39
+Geometric_Brownian_Motion,"{'threshold': 0.5, 'time_periods': 15, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.05}",1005462.92
+Geometric_Brownian_Motion,"{'threshold': 0.1, 'time_periods': 15, 'num_simulations': 150, 'take_profit_pct': 0.05, 'stop_loss_pct': 0.05}",1000112.38

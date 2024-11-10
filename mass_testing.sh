@@ -27,4 +27,4 @@ fi
 
 # Run main.py
 echo "Running mass_testing.py..."
-python3 mass_testing.py
+caffeinate -i python3 mass_testing.py
