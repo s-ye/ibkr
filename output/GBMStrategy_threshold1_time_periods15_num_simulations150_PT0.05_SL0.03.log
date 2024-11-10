@@ -1,0 +1,94 @@
+2024-11-09 22:39:06,809 - Starting GBMStrategy with initial capital: 1000000
+2024-11-09 22:39:06,809 - Hyperparameters: {'threshold': 1, 'time_periods': 15, 'num_simulations': 150}
+2024-11-09 22:41:26,154 - Short Sell 336.00 shares at 59.35 on 2024-10-09 17:15:00+00:00
+2024-11-09 22:41:26,156 - Buy to cover -336.00 shares at 58.75 on 2024-10-09 19:00:00+00:00 (Exit: Signal, Profit: 201.60000000000286, Duration: 105.0 minutes)
+2024-11-09 22:41:26,156 - Short Sell 346.00 shares at 57.72 on 2024-10-10 14:30:00+00:00
+2024-11-09 22:41:26,156 - Buy to cover -346.00 shares at 57.53 on 2024-10-10 15:00:00+00:00 (Exit: Signal, Profit: 65.73999999999921, Duration: 30.0 minutes)
+2024-11-09 22:41:26,156 - Long Buy 347.00 shares at 57.49 on 2024-10-10 16:15:00+00:00
+2024-11-09 22:41:26,156 - Sell to close 347.00 shares at 57.47 on 2024-10-11 13:30:00+00:00 (Exit: Signal, Profit: -6.94000000000355, Duration: 1275.0 minutes)
+2024-11-09 22:41:26,156 - Short Sell 349.00 shares at 57.32 on 2024-10-11 13:45:00+00:00
+2024-11-09 22:41:26,157 - Buy to cover -349.00 shares at 59.56 on 2024-10-11 15:30:00+00:00 (Exit: Stop_loss, Profit: -781.7600000000007, Duration: 105.0 minutes)
+2024-11-09 22:41:26,157 - Short Sell 338.00 shares at 59.02 on 2024-10-11 17:15:00+00:00
+2024-11-09 22:41:26,157 - Buy to cover -338.00 shares at 58.59 on 2024-10-11 19:00:00+00:00 (Exit: Signal, Profit: 145.33999999999992, Duration: 105.0 minutes)
+2024-11-09 22:41:26,157 - Long Buy 342.00 shares at 58.37 on 2024-10-14 14:30:00+00:00
+2024-11-09 22:41:26,157 - Sell to close 342.00 shares at 58.73 on 2024-10-14 14:45:00+00:00 (Exit: Signal, Profit: 123.11999999999738, Duration: 15.0 minutes)
+2024-11-09 22:41:26,157 - Short Sell 346.00 shares at 57.69 on 2024-10-15 13:45:00+00:00
+2024-11-09 22:41:26,157 - Buy to cover -346.00 shares at 57.21 on 2024-10-15 14:30:00+00:00 (Exit: Signal, Profit: 166.07999999999646, Duration: 45.0 minutes)
+2024-11-09 22:41:26,158 - Short Sell 347.00 shares at 57.63 on 2024-10-15 14:45:00+00:00
+2024-11-09 22:41:26,158 - Buy to cover -347.00 shares at 57.3 on 2024-10-15 15:45:00+00:00 (Exit: Signal, Profit: 114.51000000000187, Duration: 60.0 minutes)
+2024-11-09 22:41:26,158 - Short Sell 344.00 shares at 58.06 on 2024-10-15 16:00:00+00:00
+2024-11-09 22:41:26,158 - Buy to cover -344.00 shares at 57.42 on 2024-10-15 17:30:00+00:00 (Exit: Signal, Profit: 220.15999999999775, Duration: 90.0 minutes)
+2024-11-09 22:41:26,158 - Short Sell 347.00 shares at 57.5 on 2024-10-15 17:45:00+00:00
+2024-11-09 22:41:26,158 - Buy to cover -347.00 shares at 57.34 on 2024-10-15 18:00:00+00:00 (Exit: Signal, Profit: 55.51999999999882, Duration: 15.0 minutes)
+2024-11-09 22:41:26,158 - Long Buy 349.00 shares at 57.31 on 2024-10-15 18:45:00+00:00
+2024-11-09 22:41:26,158 - Sell to close 349.00 shares at 57.68 on 2024-10-16 13:45:00+00:00 (Exit: Signal, Profit: 129.12999999999664, Duration: 1140.0 minutes)
+2024-11-09 22:41:26,158 - Short Sell 345.00 shares at 57.84 on 2024-10-16 14:00:00+00:00
+2024-11-09 22:41:26,158 - Buy to cover -345.00 shares at 57.21 on 2024-10-16 18:30:00+00:00 (Exit: Signal, Profit: 217.35000000000332, Duration: 270.0 minutes)
+2024-11-09 22:41:26,158 - Short Sell 348.00 shares at 57.45 on 2024-10-16 18:45:00+00:00
+2024-11-09 22:41:26,158 - Buy to cover -348.00 shares at 56.84 on 2024-10-17 13:30:00+00:00 (Exit: Signal, Profit: 212.2799999999998, Duration: 1125.0 minutes)
+2024-11-09 22:41:26,159 - Short Sell 363.00 shares at 55.14 on 2024-10-17 19:30:00+00:00
+2024-11-09 22:41:26,159 - Buy to cover -363.00 shares at 54.82 on 2024-10-17 19:45:00+00:00 (Exit: Signal, Profit: 116.16000000000011, Duration: 15.0 minutes)
+2024-11-09 22:41:26,159 - Short Sell 368.00 shares at 54.34 on 2024-10-18 16:45:00+00:00
+2024-11-09 22:41:26,159 - Buy to cover -368.00 shares at 53.98 on 2024-10-18 17:30:00+00:00 (Exit: Signal, Profit: 132.48000000000502, Duration: 45.0 minutes)
+2024-11-09 22:41:26,159 - Long Buy 370.00 shares at 53.97 on 2024-10-18 18:15:00+00:00
+2024-11-09 22:41:26,159 - Sell to close 370.00 shares at 54.06 on 2024-10-21 14:00:00+00:00 (Exit: Signal, Profit: 33.30000000000389, Duration: 4065.0 minutes)
+2024-11-09 22:41:26,160 - Short Sell 374.00 shares at 53.4 on 2024-10-21 19:00:00+00:00
+2024-11-09 22:41:26,160 - Buy to cover -374.00 shares at 53.15 on 2024-10-22 13:45:00+00:00 (Exit: Signal, Profit: 93.5, Duration: 1125.0 minutes)
+2024-11-09 22:41:26,160 - Short Sell 374.00 shares at 53.45 on 2024-10-22 14:30:00+00:00
+2024-11-09 22:41:26,160 - Buy to cover -374.00 shares at 53.34 on 2024-10-22 15:00:00+00:00 (Exit: Signal, Profit: 41.13999999999713, Duration: 30.0 minutes)
+2024-11-09 22:41:26,160 - Long Buy 376.00 shares at 53.16 on 2024-10-22 17:30:00+00:00
+2024-11-09 22:41:26,160 - Sell to close 376.00 shares at 53.28 on 2024-10-22 18:45:00+00:00 (Exit: Signal, Profit: 45.12000000000171, Duration: 75.0 minutes)
+2024-11-09 22:41:26,160 - Short Sell 374.00 shares at 53.47 on 2024-10-22 19:00:00+00:00
+2024-11-09 22:41:26,160 - Buy to cover -374.00 shares at 52.97 on 2024-10-23 14:00:00+00:00 (Exit: Signal, Profit: 187.0, Duration: 1140.0 minutes)
+2024-11-09 22:41:26,161 - Long Buy 378.00 shares at 52.91 on 2024-10-23 14:45:00+00:00
+2024-11-09 22:41:26,161 - Sell to close 378.00 shares at 53.4 on 2024-10-23 15:30:00+00:00 (Exit: Signal, Profit: 185.22000000000077, Duration: 45.0 minutes)
+2024-11-09 22:41:26,161 - Short Sell 369.00 shares at 54.26 on 2024-10-23 15:45:00+00:00
+2024-11-09 22:41:26,161 - Buy to cover -369.00 shares at 53.76 on 2024-10-23 16:30:00+00:00 (Exit: Signal, Profit: 184.5, Duration: 45.0 minutes)
+2024-11-09 22:41:26,161 - Short Sell 375.00 shares at 53.39 on 2024-10-23 19:45:00+00:00
+2024-11-09 22:41:26,161 - Buy to cover -375.00 shares at 53.02 on 2024-10-24 14:00:00+00:00 (Exit: Signal, Profit: 138.74999999999903, Duration: 1095.0 minutes)
+2024-11-09 22:41:26,161 - Short Sell 374.00 shares at 53.52 on 2024-10-24 14:15:00+00:00
+2024-11-09 22:41:26,161 - Buy to cover -374.00 shares at 53.12 on 2024-10-24 14:45:00+00:00 (Exit: Signal, Profit: 149.59999999999945, Duration: 30.0 minutes)
+2024-11-09 22:41:26,161 - Short Sell 379.00 shares at 52.8 on 2024-10-24 17:15:00+00:00
+2024-11-09 22:41:26,161 - Buy to cover -379.00 shares at 52.59 on 2024-10-24 18:00:00+00:00 (Exit: Signal, Profit: 79.59000000000032, Duration: 45.0 minutes)
+2024-11-09 22:41:26,161 - Long Buy 381.00 shares at 52.51 on 2024-10-24 19:15:00+00:00
+2024-11-09 22:41:26,162 - Sell to close 381.00 shares at 53.36 on 2024-10-25 13:30:00+00:00 (Exit: Signal, Profit: 323.85000000000326, Duration: 1095.0 minutes)
+2024-11-09 22:41:26,162 - Short Sell 373.00 shares at 53.65 on 2024-10-25 13:45:00+00:00
+2024-11-09 22:41:26,162 - Buy to cover -373.00 shares at 53.38 on 2024-10-25 17:30:00+00:00 (Exit: Signal, Profit: 100.70999999999852, Duration: 225.0 minutes)
+2024-11-09 22:41:26,162 - Long Buy 376.00 shares at 53.3 on 2024-10-25 18:00:00+00:00
+2024-11-09 22:41:26,162 - Sell to close 376.00 shares at 54.65 on 2024-10-28 13:30:00+00:00 (Exit: Signal, Profit: 507.60000000000053, Duration: 4050.0 minutes)
+2024-11-09 22:41:26,162 - Short Sell 367.00 shares at 54.66 on 2024-10-28 13:45:00+00:00
+2024-11-09 22:41:26,162 - Buy to cover -367.00 shares at 54.61 on 2024-10-28 15:15:00+00:00 (Exit: Signal, Profit: 18.349999999998957, Duration: 90.0 minutes)
+2024-11-09 22:41:26,162 - Long Buy 366.00 shares at 54.76 on 2024-10-28 16:30:00+00:00
+2024-11-09 22:41:26,162 - Sell to close 366.00 shares at 54.52 on 2024-10-28 19:00:00+00:00 (Exit: Signal, Profit: -87.83999999999813, Duration: 150.0 minutes)
+2024-11-09 22:41:26,162 - Short Sell 365.00 shares at 54.82 on 2024-10-28 19:30:00+00:00
+2024-11-09 22:41:26,162 - Buy to cover -365.00 shares at 56.64 on 2024-10-29 13:30:00+00:00 (Exit: Stop_loss, Profit: -664.3000000000001, Duration: 1080.0 minutes)
+2024-11-09 22:41:26,163 - Long Buy 364.00 shares at 55.07 on 2024-10-29 16:15:00+00:00
+2024-11-09 22:41:26,163 - Sell to close 364.00 shares at 55.49 on 2024-10-29 17:15:00+00:00 (Exit: Signal, Profit: 152.88000000000062, Duration: 60.0 minutes)
+2024-11-09 22:41:26,163 - Long Buy 363.00 shares at 55.12 on 2024-10-29 19:00:00+00:00
+2024-11-09 22:41:26,163 - Sell to close 363.00 shares at 53.64 on 2024-10-30 17:30:00+00:00 (Exit: Stop_loss, Profit: -537.2399999999963, Duration: 1350.0 minutes)
+2024-11-09 22:41:26,163 - Short Sell 368.00 shares at 54.38 on 2024-10-30 18:00:00+00:00
+2024-11-09 22:41:26,163 - Buy to cover -368.00 shares at 53.4 on 2024-10-31 13:30:00+00:00 (Exit: Signal, Profit: 360.64000000000146, Duration: 1170.0 minutes)
+2024-11-09 22:41:26,163 - Long Buy 375.00 shares at 53.44 on 2024-10-31 14:30:00+00:00
+2024-11-09 22:41:26,163 - Sell to close 375.00 shares at 53.92 on 2024-10-31 16:30:00+00:00 (Exit: Signal, Profit: 180.00000000000148, Duration: 120.0 minutes)
+2024-11-09 22:41:26,164 - Long Buy 375.00 shares at 53.47 on 2024-10-31 17:30:00+00:00
+2024-11-09 22:41:26,164 - Sell to close 375.00 shares at 53.79 on 2024-10-31 18:15:00+00:00 (Exit: Signal, Profit: 120.00000000000011, Duration: 45.0 minutes)
+2024-11-09 22:41:26,164 - Short Sell 371.00 shares at 53.95 on 2024-10-31 18:45:00+00:00
+2024-11-09 22:41:26,164 - Buy to cover -371.00 shares at 54.69 on 2024-11-01 19:15:00+00:00 (Exit: Signal, Profit: -274.5399999999981, Duration: 1470.0 minutes)
+2024-11-09 22:41:26,164 - Short Sell 361.00 shares at 55.5 on 2024-11-04 15:15:00+00:00
+2024-11-09 22:41:26,164 - Buy to cover -361.00 shares at 54.71 on 2024-11-04 16:00:00+00:00 (Exit: Signal, Profit: 285.1899999999997, Duration: 45.0 minutes)
+2024-11-09 22:41:26,164 - Short Sell 369.00 shares at 54.25 on 2024-11-04 19:00:00+00:00
+2024-11-09 22:41:26,164 - Buy to cover -369.00 shares at 53.88 on 2024-11-04 20:00:00+00:00 (Exit: Signal, Profit: 136.52999999999906, Duration: 60.0 minutes)
+2024-11-09 22:41:26,165 - Short Sell 376.00 shares at 53.27 on 2024-11-05 15:15:00+00:00
+2024-11-09 22:41:26,165 - Buy to cover -376.00 shares at 52.4 on 2024-11-05 17:00:00+00:00 (Exit: Signal, Profit: 327.1200000000017, Duration: 105.0 minutes)
+2024-11-09 22:41:26,165 - Long Buy 380.00 shares at 52.76 on 2024-11-05 17:30:00+00:00
+2024-11-09 22:41:26,165 - Sell to close 380.00 shares at 52.67 on 2024-11-05 18:30:00+00:00 (Exit: Signal, Profit: -34.199999999998596, Duration: 60.0 minutes)
+2024-11-09 22:41:26,165 - Short Sell 380.00 shares at 52.66 on 2024-11-05 18:45:00+00:00
+2024-11-09 22:41:26,165 - Buy to cover -380.00 shares at 50.46 on 2024-11-06 14:30:00+00:00 (Exit: Signal, Profit: 835.9999999999984, Duration: 1185.0 minutes)
+2024-11-09 22:41:26,165 - Short Sell 387.00 shares at 51.82 on 2024-11-06 15:45:00+00:00
+2024-11-09 22:41:26,165 - Buy to cover -387.00 shares at 51.73 on 2024-11-06 19:30:00+00:00 (Exit: Signal, Profit: 34.83000000000132, Duration: 225.0 minutes)
+2024-11-09 22:41:26,165 - Short Sell 385.00 shares at 52.09 on 2024-11-06 20:30:00+00:00
+2024-11-09 22:41:26,165 - Buy to cover -385.00 shares at 53.43 on 2024-11-07 14:30:00+00:00 (Exit: Stop_loss, Profit: -515.8999999999986, Duration: 1080.0 minutes)
+2024-11-09 22:41:26,166 - Long Buy 388.00 shares at 51.65 on 2024-11-07 16:15:00+00:00
+2024-11-09 22:41:26,166 - Sell to close 388.00 shares at 51.96 on 2024-11-07 16:45:00+00:00 (Exit: Signal, Profit: 120.28000000000088, Duration: 30.0 minutes)
+2024-11-09 22:41:26,166 - Short Sell 385.00 shares at 52.08 on 2024-11-07 17:00:00+00:00
+2024-11-09 22:41:26,166 - Buy to cover -385.00 shares at 51.38 on 2024-11-07 17:30:00+00:00 (Exit: Signal, Profit: 269.49999999999835, Duration: 30.0 minutes)
