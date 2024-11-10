@@ -1,6 +1,6 @@
 from ib_insync import IB, Stock, Ticker, util
 from datetime import datetime
-from strategies import BollingerBandsStrategy
+from strategies import GBMStrategy
 import logging
 import time
 import os
@@ -99,21 +99,22 @@ if __name__ == '__main__':
     ib.qualifyContracts(stock)
     
     bars = ib.reqHistoricalData(
-        stock, endDateTime='', durationStr='2 D', barSizeSetting='15 mins',
+        stock, endDateTime='', durationStr='1 min', barSizeSetting='15 secs',
         whatToShow='MIDPOINT', useRTH=True
     )
     data = util.df(bars)
     
     # Initialize the strategy with parameters
     strategy_params = {
-        'period': 20,
-        'std_dev': 1.5,
+        'threshold': 1,
+        'time_periods': 30,
+        'num_simulations': 100,
         'profit_target_pct': 0.05,
         'trailing_stop_pct': 0.03
     }
     # calculate initial capital and position
     initial_capital, position = get_initial_capital_and_position(stock_symbol)
-    strategy = BollingerBandsStrategy(stock, data, ib, params=strategy_params, initial_capital=initial_capital)
+    strategy = GBMStrategy(stock, data, ib, strategy_params, initial_capital=initial_capital, position_size_pct=0.02)
     strategy.current_position = position  # Set the current AAPL position
 
 
