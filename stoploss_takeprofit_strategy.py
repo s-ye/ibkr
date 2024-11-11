@@ -6,6 +6,7 @@ import logging
 import os
 from ib_insync import MarketOrder
 import pandas as pd
+import datetime
 
 
 class StopLossTakeProfitStrategy(BaseStrategy):
@@ -19,9 +20,20 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         self.avg_entry_price = 0
         self.entry_date = None
         self.highest_price_since_entry = 0
-        self.lowest_price_since_entry = 0
+        # set lowest price to infty
+        self.lowest_price_since_entry = float('inf')
         self._setup_logger()
 
+    def log_statistics_and_trades(self, statistics):
+        # Prepare statistics string
+
+        stats_str = f"Final statistics"
+        for key, value in statistics.items():
+            stats_str += f"{key}: {value}, " + "\n"
+        stats_str += "\n\n"
+
+        # Log statistics
+        self.logger.info(stats_str)
     # existing methods like _execute_trades, _should_buy, etc.
     def _should_buy(self, i):
         return self.data_with_signals['signal'].iloc[i] == 1 
@@ -96,7 +108,7 @@ class StopLossTakeProfitStrategy(BaseStrategy):
 
         # Set dynamic filename based on final portfolio value
         final_value_str = f"{self.final_portfolio_value:.2f}" if self.final_portfolio_value is not None else "NA"
-        filename = filename or f"output/{final_value_str}_{self.__class__.__name__}_{param_str}.png"
+        filename = filename or f"output/{final_value_str}_{self.stock.symbol}_{self.__class__.__name__}_{param_str}.png"
 
         # Save plot to file
         plt.savefig(filename)
@@ -123,23 +135,23 @@ class StopLossTakeProfitStrategy(BaseStrategy):
                 elif self._should_sell(i):
                     self._sell_position_short(current_price, i)
             elif self.current_position > 0:
-                if self._should_buy(i):
-                    self._buy_position(current_price, i)
-                if self._should_sell(i):
-                    self._sell_position(current_price, i, 'signal')
-                elif self._hit_profit_target(current_price):
+                if self._hit_profit_target(current_price):
                     self._sell_position(current_price, i, 'profit_take')
                 elif self._hit_trailing_stop(current_price):
                     self._sell_position(current_price, i, 'stop_loss')
+                elif self._should_buy(i):
+                    self._buy_position(current_price, i)
+                elif self._should_sell(i):
+                    self._sell_position(current_price, i, 'signal')
             elif self.current_position < 0:
-                if self._should_sell(i):
-                    self._sell_position_short(current_price, i)
-                if self._should_buy(i):
-                    self._buy_position_short(current_price, i, 'signal')
-                elif self._hit_profit_target_short(current_price):
+                if self._hit_profit_target_short(current_price):
                     self._buy_position_short(current_price, i, 'profit_take')
                 elif self._hit_trailing_stop_short(current_price):
                     self._buy_position_short(current_price, i, 'stop_loss')
+                elif self._should_sell(i):
+                    self._sell_position_short(current_price, i)
+                elif self._should_buy(i):
+                    self._buy_position_short(current_price, i, 'signal')
 
 
             # Update highest price since entry if holding position
@@ -164,7 +176,7 @@ class StopLossTakeProfitStrategy(BaseStrategy):
             self.current_balance -= buy_cost
             self.entry_date = self.data_with_signals.index[index] if self.current_position == 0 else self.entry_date
             self.current_position += shares_to_buy
-            self.highest_price_since_entry = current_price
+            self.highest_price_since_entry = max(self.highest_price_since_entry, current_price)
             self.logger.info(f"Long Buy {shares_to_buy:.2f} shares at {current_price} on {self.data_with_signals.index[index]}")
 
     def _sell_position(self, current_price, index, exit_type):
@@ -202,14 +214,16 @@ class StopLossTakeProfitStrategy(BaseStrategy):
 
     def _sell_position_short(self, current_price, index):
         """Helper method to execute a sell operation and log the type of exit."""
-        shares_to_sell = (self.current_balance * self.position_size_pct) // current_price
+        without_margin = self.current_balance + (self.current_position * current_price)
+        shares_to_sell = (without_margin * self.position_size_pct) // current_price
         sell_revenue = shares_to_sell * current_price
         if shares_to_sell > 0:
             self.avg_entry_price = ((self.avg_entry_price * abs(self.current_position)) + (current_price * shares_to_sell)) / (abs(self.current_position) + shares_to_sell)
             self.current_balance += sell_revenue
             self.entry_date = self.data_with_signals.index[index] if self.current_position == 0 else self.entry_date
             self.current_position -= shares_to_sell
-            self.lowest_price_since_entry = current_price
+            # update the lowest price since entry as the minimum of the current price and the lowest price since entry
+            self.lowest_price_since_entry = min(self.lowest_price_since_entry, current_price)
             self.logger.info(f"Short Sell {shares_to_sell:.2f} shares at {current_price} on {self.data_with_signals.index[index]}")
 
     def _buy_position_short(self, current_price, index,exit_type):
@@ -241,7 +255,7 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         self.current_position = 0
         self.avg_entry_price = 0
         self.entry_date = None
-        self.lowest_price_since_entry = 0
+        self.lowest_price_since_entry = float('inf')
 
 
 
@@ -329,7 +343,7 @@ class StopLossTakeProfitStrategy(BaseStrategy):
     
     def _hit_trailing_stop_short(self, current_price):
         """Check if the trailing stop is met."""
-        if self.lowest_price_since_entry == 0:
+        if self.lowest_price_since_entry == float('inf'):
             return False
         return (current_price - self.lowest_price_since_entry) / self.lowest_price_since_entry >= self.trailing_stop_pct
     
@@ -338,9 +352,9 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         # Format the hyperparameters for file naming
         hyperparam_str = "_".join([f"{k}{v}" for k, v in self.params.items()])
         hyperparam_str += f"_PT{self.profit_target_pct}_SL{self.trailing_stop_pct}"
-        log_filename = os.path.join("output", f"{self.__class__.__name__}_{hyperparam_str}.log")
+        log_filename = os.path.join("output", f"{self.stock.symbol}_{self.__class__.__name__}_{hyperparam_str}.log")
 
-        self.logger = logging.getLogger(f"{self.__class__.__name__}_{hyperparam_str}")
+        self.logger = logging.getLogger(f"{self.stock.symbol}_{self.__class__.__name__}_{hyperparam_str}")
 
         # Clear existing handlers to avoid duplicate logging
         if self.logger.hasHandlers():

@@ -17,7 +17,7 @@ class Backtester:
         self.ib.connect('127.0.0.1', 7497, clientId=client_id)
         self.stock = Stock(stock_symbol, exchange, currency)
         self.ib.qualifyContracts(self.stock)
-        self.full_data = self._get_full_historical_data(stock_symbol)
+        # self.full_data = self._get_full_historical_data(stock_symbol)
         # Ensure cache directory exists
         if not os.path.exists('cache'):
             os.makedirs('cache')
@@ -52,7 +52,8 @@ class Backtester:
         results = []
         for _ in range(num_samples):
             sample_data = self._get_random_sample(duration_days)
-            print(sample_data)
+            # print 20 lines of the sample data
+            print(sample_data.head(50))
             if gbm_params:
                 for threshold, time_periods, num_simulations, take_profit_pct, stop_loss_pct in product(
                         gbm_params['threshold'],
@@ -169,8 +170,4 @@ class Backtester:
             # Run the backtest and gather results
             gbm_strategy.backtest()
             stats = gbm_strategy.trade_statistics()
-
-            # Append results with checks
-            print(stats)
-
             gbm_strategy.plot_trades()
