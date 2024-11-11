@@ -124,11 +124,15 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         self.data_with_signals['profit_take'] = False
         self.data_with_signals['stop_loss'] = False
 
+        halted_trading_day = None
+
         for i in range(1, len(self.data_with_signals)):
             current_price = self.data_with_signals['close'].iloc[i]
             portfolio_value = self.current_balance + (self.current_position * current_price)
             self.portfolio_values.append({'date': self.data_with_signals.index[i], 'portfolio_value': portfolio_value})
 
+            if halted_trading_day == self.data_with_signals.index[i].date():
+                continue
             if self.current_position == 0:
                 if self._should_buy(i):
                     self._buy_position(current_price, i)
@@ -139,6 +143,10 @@ class StopLossTakeProfitStrategy(BaseStrategy):
                     self._sell_position(current_price, i, 'profit_take')
                 elif self._hit_trailing_stop(current_price):
                     self._sell_position(current_price, i, 'stop_loss')
+                    # stop losses come with a 1 day cooldown
+                    # no more trades can be made on the same day
+                    halted_trading_day = self.data_with_signals.index[i].date()
+
                 elif self._should_buy(i):
                     self._buy_position(current_price, i)
                 elif self._should_sell(i):
@@ -148,6 +156,9 @@ class StopLossTakeProfitStrategy(BaseStrategy):
                     self._buy_position_short(current_price, i, 'profit_take')
                 elif self._hit_trailing_stop_short(current_price):
                     self._buy_position_short(current_price, i, 'stop_loss')
+                    # stop losses come with a 1 day cooldown
+                    # no more trades can be made on the same day
+                    halted_trading_day = self.data_with_signals.index[i].date()
                 elif self._should_sell(i):
                     self._sell_position_short(current_price, i)
                 elif self._should_buy(i):
