@@ -1,11 +1,11 @@
 from backtester import Backtester
 if __name__ == "__main__":
     gbm_params = {
-        'threshold': [.5],
-        'time_periods': [15],
+        'threshold': [.25,.5,1],
+        'time_periods': [30],
         'num_simulations': [150],
-        'take_profit_pct': [0.02],
-        'stop_loss_pct': [0.02]
+        'take_profit_pct': [0.03],
+        'stop_loss_pct': [0.03]
     }
 
     
@@ -16,6 +16,11 @@ if __name__ == "__main__":
                     'MGM', 'BR', 'GD', 'ADP', 'PPL', 'NI', 'MLM', 'IDXX', 'HCA', 'SHW', 'HWM', 'ZTS', 'RCL', 'GWW', 'CDW', 'CAH', 'HPE', 'HD',
                     'HSY', 'RTX', 'UNP', 'MCK', 'AES', 'FICO', 'INTC', 'JCI', 'ATO', 'HAS', 'LOW', 'ALLE', 'WELL', 'ISRG', 'VRSN', 'TRGP', 'LMT']
     short_tickers = ['ETSY', 'DXCM', 'ILMN', 'PAYC', 'VFC', 'ABNB', 'APA', 'UPS', 'EPAM', 'CHTR', 'MOS', 'EXPE', 'MPC', 'PANW', 'VLO', 'COR', 'BXP', 'MRO', 'HAL', 'MRNA']
+
+    # scramble the order
+    import random
+    random.shuffle(long_tickers)
+    random.shuffle(short_tickers)
 
     for ticker in long_tickers:
         backtester = Backtester(ticker, 'SMART', 'USD')
