@@ -1,16 +1,18 @@
 from backtester import Backtester
 
+stock = 'MRNA'
+
     # Example usage
 if __name__ == "__main__":
     gbm_params = {
         'threshold': [0.5],
         'time_periods': [15],
         'num_simulations': [150],
-        'take_profit_pct': [0.05],
-        'stop_loss_pct': [0.03]
+        'take_profit_pct': [0.01],
+        'stop_loss_pct': [0.01]
     }
 
-    backtester = Backtester('MRNA', 'SMART', 'USD')
+    backtester = Backtester(stock, 'SMART', 'USD')
 
 
     # Run backtests with sampled periods and parameter grids
@@ -33,7 +35,7 @@ if __name__ == "__main__":
 
 
     # Step 5: Save the formatted DataFrame to CSV
-    output_file = 'results/average_results.csv'
+    output_file = 'results/{stock}_average_results.csv'
     average_results.to_csv(output_file, index=False)
 
     print(f"Formatted average results saved to {output_file}")

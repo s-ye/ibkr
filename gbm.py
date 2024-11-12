@@ -12,7 +12,7 @@
 # and sell when the price is above the expected price + (std_dev * threshold).
 
 import pymc as pm
-import numpy as np
+import numpy as np 
 import arviz as az
 import pandas as pd
 import matplotlib.pyplot as plt

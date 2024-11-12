@@ -1,11 +1,11 @@
 from backtester import Backtester
 if __name__ == "__main__":
     gbm_params = {
-        'threshold': [.25,.5,1],
+        'threshold': [1.5],
         'time_periods': [30],
         'num_simulations': [150],
-        'take_profit_pct': [0.03],
-        'stop_loss_pct': [0.03]
+        'take_profit_pct': [0.005],
+        'stop_loss_pct': [0.01]
     }
 
     
