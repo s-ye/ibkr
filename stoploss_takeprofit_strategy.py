@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from base_strategy import BaseStrategy
 import logging
 import os
+import numpy as np
 from ib_insync import MarketOrder
 import pandas as pd
 import datetime
@@ -22,6 +23,7 @@ class StopLossTakeProfitStrategy(BaseStrategy):
         self.highest_price_since_entry = 0
         # set lowest price to infty
         self.lowest_price_since_entry = float('inf')
+        self.logger = None
         self._setup_logger()
 
     def log_statistics_and_trades(self, statistics):
@@ -34,6 +36,93 @@ class StopLossTakeProfitStrategy(BaseStrategy):
 
         # Log statistics
         self.logger.info(stats_str)
+
+    def trade_statistics(self):
+        if not self.trades and self.current_position == 0:
+            # No trades and no open position
+            print("No trades were recorded.")
+            # write to log file
+            self.logger.info(f"No trades were recorded.")
+            return {
+                'total_trades': 0,
+                'winning_trades': 0,
+                'losing_trades': 0,
+                'average_return': None,
+                'average_duration': None,
+                'final_balance': self.current_balance,
+                'final_portfolio_value': self.final_portfolio_value
+            }
+        
+        # Convert trades to DataFrame if trades were recorded
+        df_trades = pd.DataFrame(self.trades) if self.trades else pd.DataFrame(columns=['return', 'duration'])
+        
+        # Check for open position at the end of the backtest
+        if self.current_position > 0:
+            final_price = self.data_with_signals['close'].iloc[-1]
+            unrealized_return = (final_price - self.avg_entry_price) / self.avg_entry_price
+            unrealized_duration = (self.data_with_signals.index[-1] - self.entry_date).total_seconds() / 60  # Duration in minutes
+            
+            # Add hypothetical trade to the DataFrame
+            df_trades = pd.concat([df_trades, pd.DataFrame([{
+                'entry_date': self.entry_date,
+                'exit_date': self.data_with_signals.index[-1],
+                'entry_price': self.avg_entry_price,
+                'exit_price': final_price,
+                'shares': self.current_position,
+                'return': unrealized_return,
+                'profit': unrealized_return * self.avg_entry_price * self.current_position,
+                'duration': unrealized_duration
+            }])], ignore_index=True)
+            
+            print(f"Holding {self.current_position} shares as an open position at the end with unrealized return: {unrealized_return}, Duration: {unrealized_duration} minutes")
+            # write to log file
+            self.logger.info(f"Holding {self.current_position} shares as an open position at the end with unrealized return: {unrealized_return}, Duration: {unrealized_duration} minutes")
+        
+        # Force columns to numeric for calculations
+        df_trades['return'] = pd.to_numeric(df_trades['return'], errors='coerce')
+        df_trades['duration'] = pd.to_numeric(df_trades['duration'], errors='coerce')
+        
+        def calculate_sharpe(df_trades):
+            """
+            Calculate the Sharpe Ratio from trade returns, assuming duration is in minutes.
+            """
+            # Filter out trades with very short durations (e.g., <1 minute) to avoid division by very small numbers
+            df_trades = df_trades[df_trades['duration'] > 1]
+
+            # Calculate daily returns, making sure 'duration' is in minutes
+            df_trades['daily_return'] = df_trades['return'] / (df_trades['duration'] / (60 * 24))
+            daily_returns = df_trades['daily_return']
+
+            # Debugging: Print mean and standard deviation of daily returns
+            print(f"Mean daily return: {daily_returns.mean()}")
+            print(f"Standard deviation of daily returns: {daily_returns.std()}")
+
+            # Calculate Sharpe Ratio, using np.sqrt(252) to annualize
+            if daily_returns.std() != 0:
+                sharpe_ratio = np.sqrt(252) * daily_returns.mean() / daily_returns.std()
+            else:
+                print("Standard deviation of daily returns is zero, setting Sharpe Ratio to 0.")
+                sharpe_ratio = 0  # Avoid division by zero if standard deviation is zero
+
+            return sharpe_ratio
+
+
+        self.sharpe_ratio = calculate_sharpe(df_trades)
+        # Calculate trade statistics
+        stats = {
+            'Stock': self.stock.symbol,
+            'total_trades': len(df_trades),
+            'winning_trades': df_trades[df_trades['return'] > 0].shape[0],
+            'losing_trades': df_trades[df_trades['return'] <= 0].shape[0],
+            'average_return': df_trades['return'].mean(),
+            'average_duration': df_trades['duration'].mean(),
+            'final_balance': self.current_balance,
+            'final_portfolio_value': self.final_portfolio_value,
+            'sharpe_ratio': self.sharpe_ratio
+        }
+
+        self.log_statistics_and_trades(stats)
+        return stats
     # existing methods like _execute_trades, _should_buy, etc.
     def _should_buy(self, i):
         return self.data_with_signals['signal'].iloc[i] == 1 
@@ -360,12 +449,18 @@ class StopLossTakeProfitStrategy(BaseStrategy):
     
     def _setup_logger(self):
         """Sets up a logger for the strategy instance that overwrites on each run."""
+        # if no output directory exists, create it
+        if not os.path.exists('output'):
+            os.makedirs('output')
         # Format the hyperparameters for file naming
         hyperparam_str = "_".join([f"{k}{v}" for k, v in self.params.items()])
         hyperparam_str += f"_PT{self.profit_target_pct}_SL{self.trailing_stop_pct}"
-        log_filename = os.path.join("output", f"{self.stock.symbol}_{self.__class__.__name__}_{hyperparam_str}.log")
 
-        self.logger = logging.getLogger(f"{self.stock.symbol}_{self.__class__.__name__}_{hyperparam_str}")
+        date = self.data.index[-1].strftime("%Y-%m-%d")
+
+        log_filename = os.path.join("output", f"{self.stock.symbol}_{date}_{self.__class__.__name__}_{hyperparam_str}.log")
+
+        self.logger = logging.getLogger(f"{self.stock.symbol}_{date}_{self.__class__.__name__}_{hyperparam_str}")
 
         # Clear existing handlers to avoid duplicate logging
         if self.logger.hasHandlers():

@@ -5,11 +5,11 @@ stock = 'MRNA'
     # Example usage
 if __name__ == "__main__":
     gbm_params = {
-        'threshold': [0.5],
-        'time_periods': [15],
+        'threshold': [0.1],
+        'time_periods': [30],
         'num_simulations': [150],
-        'take_profit_pct': [0.01],
-        'stop_loss_pct': [0.01]
+        'take_profit_pct': [0.02],
+        'stop_loss_pct': [0.02]
     }
 
     backtester = Backtester(stock, 'SMART', 'USD')
@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     # Run backtests with sampled periods and parameter grids
     results_df, average_results = backtester.run_sampled_backtests(
-        num_samples=100, duration_days=30, gbm_params=gbm_params
+        num_samples=2, duration_days=30, gbm_params=gbm_params
     )
 
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
 
     # Step 5: Save the formatted DataFrame to CSV
-    output_file = 'results/{stock}_average_results.csv'
+    output_file = f'results/{stock}_average_results.csv'
     average_results.to_csv(output_file, index=False)
 
     print(f"Formatted average results saved to {output_file}")
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     top_3_per_start_date = top_3_per_start_date[['Start Date', 'Rank', 'Strategy Name', 'Parameters', 'Final Portfolio Value']]
 
     # Step 5: Export to CSV with specific formatting options
-    output_file = 'results/top_strategies_by_start_date.csv'
+    output_file = f'results/{stock}_top_strategies_by_start_date.csv'
     top_3_per_start_date.to_csv(output_file, index=False, float_format='%.2f')
     print(f"Top 3 strategies per start date saved to {output_file}")
 

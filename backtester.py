@@ -68,8 +68,9 @@ class Backtester:
                         trailing_stop_pct=stop_loss_pct
                     )
                     gbm_strategy.backtest()
-                    gbm_strategy.plot_trades()
                     stats = gbm_strategy.trade_statistics()
+                    gbm_strategy.plot_trades()
+                    
                     results.append({
                         'strategy': 'Geometric_Brownian_Motion',
                         'params': {'threshold': threshold, 'time_periods': time_periods, 'num_simulations': num_simulations,

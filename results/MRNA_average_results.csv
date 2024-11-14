@@ -1,0 +1,2 @@
+strategy,params,Final Portfolio Value
+Geometric_Brownian_Motion,"{'threshold': 0.1, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.02, 'stop_loss_pct': 0.02}",992253.94
