@@ -34,8 +34,12 @@ class StopLossTakeProfitStrategy(BaseStrategy):
             stats_str += f"{key}: {value}, " + "\n"
         stats_str += "\n\n"
 
-        # Log statistics
-        self.logger.info(stats_str)
+        # Log statistics to the head of the log file
+        with open(self.logger.handlers[0].baseFilename, 'r+') as file:
+            content = file.read()
+            file.seek(0, 0)
+            file.write(stats_str + content)
+
 
     def trade_statistics(self):
         if not self.trades and self.current_position == 0:
@@ -458,7 +462,7 @@ class StopLossTakeProfitStrategy(BaseStrategy):
 
         date = self.data.index[-1].strftime("%Y-%m-%d")
 
-        log_filename = os.path.join("output", f"{self.stock.symbol}_{date}_{self.__class__.__name__}_{hyperparam_str}.log")
+        log_filename = os.path.join("output", f"{self.final_portfolio_value}_{self.stock.symbol}_{date}_{self.__class__.__name__}_{hyperparam_str}.log")
 
         self.logger = logging.getLogger(f"{self.stock.symbol}_{date}_{self.__class__.__name__}_{hyperparam_str}")
 

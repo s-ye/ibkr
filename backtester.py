@@ -12,26 +12,26 @@ from ib_insync import IB, Stock, util
 from strategies import *
 
 class Backtester:
-    def __init__(self, stock_symbol, exchange, currency, client_id=1):
-        self.ib = IB()
-        self.ib.connect('127.0.0.1', 7497, clientId=client_id)
+    def __init__(self, stock_symbol, exchange, currency):
+        self.ib = None
         self.stock = Stock(stock_symbol, exchange, currency)
-        self.ib.qualifyContracts(self.stock)
-        self.full_data = self._get_full_historical_data(stock_symbol)
+        self.full_data = self._get_full_historical_data(stock_symbol, exchange, currency)
         # Ensure cache directory exists
         if not os.path.exists('cache'):
             os.makedirs('cache')
-        self.data = self._get_historical_data(stock_symbol)
-        self.disconnect()
+        self.data = self._get_historical_data(stock_symbol, exchange, currency)
 
 
-    def _get_full_historical_data(self, stock_symbol):
+    def _get_full_historical_data(self, stock_symbol, exchange, currency):
         cache_file = f"cache/{stock_symbol}_2year_15min_data.csv"
         if os.path.exists(cache_file):
             print("Loading full historical data from cache...")
             return pd.read_csv(cache_file, index_col='date', parse_dates=True)
         
         print("Fetching 2 Y of historical 15-minute data from IBKR...")
+        self.ib = IB()
+        self.ib.connect('127.0.0.1', 7497, clientId=1)
+        self.ib.qualifyContracts(self.stock)
         bars = self.ib.reqHistoricalData(
             self.stock,
             endDateTime='',
@@ -46,7 +46,9 @@ class Backtester:
         if not os.path.exists('cache'):
             os.makedirs('cache')
         df.to_csv(cache_file)
+        self.ib.disconnect()
         return df
+        
 
     def run_sampled_backtests(self, num_samples=100, duration_days=30,gbm_params=None):
         results = []
@@ -123,7 +125,7 @@ class Backtester:
     def disconnect(self):
         self.ib.disconnect()
 
-    def _get_historical_data(self, stock_symbol):
+    def _get_historical_data(self, stock_symbol, exchange, currency):
 
         cache_file = f"cache/{stock_symbol}_1month_15min_data.csv"
         if os.path.exists(cache_file):
@@ -131,6 +133,10 @@ class Backtester:
             return pd.read_csv(cache_file, index_col='date', parse_dates=True)
         
         print("Fetching 1 M of historical 15-minute data from IBKR...")
+        self.ib = IB()
+        self.ib.connect('127.0.0.1', 7497, clientId=1)
+        self.stock = Stock(stock_symbol, exchange, currency)
+        self.ib.qualifyContracts(self.stock)
         bars = self.ib.reqHistoricalData(
             self.stock,
             endDateTime='',
@@ -143,6 +149,7 @@ class Backtester:
         df.to_csv(cache_file)
         # index by date
         df.set_index('date', inplace=True)
+        self.ib.disconnect()
         return df
 
     def run_gbm_strategy(self, gbm_params):

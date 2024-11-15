@@ -27,7 +27,6 @@ class GBMModel:
         self.mu_mean = .01
         self.mu_std = .1
         self.sigma_scale = .1
-        self.chain = 6
         
 
     def fit(self):
@@ -42,8 +41,13 @@ class GBMModel:
             likelihood = pm.Normal('returns', mu=mu, sigma=sigma, observed=returns)
             
             # MCMC sampling
-            self.trace = pm.sample(2000, tune=1000, target_accept=0.9, chains=self.chain)
-
+            self.trace = pm.sample(
+                1000,               # reduce total samples
+                tune=500,           # reduce tuning steps
+                target_accept=0.8,  # lower target acceptance
+                chains=4,           # fewer chains
+                cores=4             # parallelize on 4 cores
+            )
     def simulate_future_prices(self, start_price, time_periods, num_simulations=100):
         simulations = np.zeros((num_simulations, time_periods))
         
