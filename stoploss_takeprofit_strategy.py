@@ -462,7 +462,7 @@ class StopLossTakeProfitStrategy(BaseStrategy):
 
         date = self.data.index[-1].strftime("%Y-%m-%d")
 
-        log_filename = os.path.join("output", f"{self.final_portfolio_value}_{self.stock.symbol}_{date}_{self.__class__.__name__}_{hyperparam_str}.log")
+        log_filename = os.path.join("output", f"{self.stock.symbol}_{date}_{self.__class__.__name__}_{hyperparam_str}.log")
 
         self.logger = logging.getLogger(f"{self.stock.symbol}_{date}_{self.__class__.__name__}_{hyperparam_str}")
 

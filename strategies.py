@@ -3,6 +3,7 @@ from base_strategy import BaseStrategy
 import pandas as pd
 import matplotlib.pyplot as plt
 from stoploss_takeprofit_strategy import StopLossTakeProfitStrategy
+import matplotlib.dates as mdates
 from datetime import time
 
 import numpy as np
@@ -10,7 +11,11 @@ import matplotlib.pyplot as plt
 import gbm as gbm
 
 class GBMStrategy(StopLossTakeProfitStrategy):
-    def __init__(self, contract, data, ib, params,initial_capital=1_000_000, position_size_pct=0.02,profit_target_pct=0.05, trailing_stop_pct = 0.03):
+    # historical_data is the data used to fit the model
+    # data is the data used to generate signals
+    # the model will also be updated as new data comes in
+    def __init__(self, contract, data, historical_data,
+                 ib, params,initial_capital=1_000_000, position_size_pct=0.02,profit_target_pct=0.05, trailing_stop_pct = 0.03):
         super().__init__(contract, data, ib, params, initial_capital=initial_capital, position_size_pct=position_size_pct, profit_target_pct=profit_target_pct, trailing_stop_pct=trailing_stop_pct)
         self.threshold = self.params.get('threshold', 1)
         self.time_periods = self.params.get('time_periods', 30)
@@ -26,6 +31,10 @@ class GBMStrategy(StopLossTakeProfitStrategy):
         num_periods = len(self.data)
         predictions = {}  # Dictionary to store predictions for each time_periods block
         min_data_points = self.time_periods  # Minimum data points required to fit the model
+
+        # consider the historical data
+        # we initialize the model with the historical data up to the current period
+        # and then generate predictions for the next 'self.time_periods' periods
 
         def fit_model(start_idx):
             """
@@ -97,5 +106,59 @@ class GBMStrategy(StopLossTakeProfitStrategy):
         plt.plot(self.data.index, expected_prices, label="Expected Price", color="purple", linestyle="--")
         plt.plot(self.data.index, buy_thresholds, label="Buy Threshold", color="green", linestyle="--")
         plt.plot(self.data.index, sell_thresholds, label="Sell Threshold", color="red", linestyle="--")
+
+        plt.title(f"GBM Strategy: {self.contract.symbol}")
+        plt.legend()
+        plt.show()
+
+
+    def forecast(self):
+        """
+        Fit the model to self.data and forecast the next 'self.time_periods' periods.
+        """
+        model = gbm.GBMModel(self.data)
+        model.fit()
+        start_price = self.data['close'].iloc[-1]
+
+        # Simulate future prices
+        simulations = model.simulate_future_prices(start_price, self.time_periods, self.num_simulations)
+        mean, std = np.mean(simulations, axis=0), np.std(simulations, axis=0)
+
+        # Generate forecast dates based on the frequency of the original data
+        last_date = self.data.index[-1]
+        frequency = self.data.index[-1] - self.data.index[-2]
+        forecast_dates = pd.bdate_range(start=last_date, periods=self.time_periods + 1)[1:]
+
+        # Plotting the mean forecast with confidence interval
+        plt.plot(forecast_dates, mean, color='blue', label='Mean Forecast')
+        plt.fill_between(forecast_dates, mean - 2 * std, mean + 2 * std, color='gray', alpha=0.2)
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
+
+        plt.title(f"GBM Forecast: {self.contract.symbol}")
+        plt.xlabel("Date (MM-DD)")
+        plt.ylabel("Price")
+        plt.legend()
+        plt.savefig(f"output/{self.contract.symbol}_forecast.png")
+
+        # Calculate 95% confidence interval
+        ci_lower = mean[-1] - 2 * std[-1]
+        ci_upper = mean[-1] + 2 * std[-1]
+
+        # Logging forecasted prices with dates
+        with open(f"output/{self.contract.symbol}_forecast.txt", "w") as f:
+            f.write("Forecasted Prices (Date, Mean, and Std):\n")
+            for i, date in enumerate(forecast_dates):
+                f.write(f"{date.strftime('%Y-%m-%d %H:%M')}: Mean = {mean[i]:.2f}, Std = {std[i]:.2f}\n")
+            f.write("\n95% Confidence Interval:\n")
+            f.write(f"Lower Bound: {ci_lower:.2f}\n")
+            f.write(f"Upper Bound: {ci_upper:.2f}\n")
+
+
+
+
+
+    
+
+        
 
 # introduce GBM with Volume data

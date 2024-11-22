@@ -24,7 +24,7 @@ class GBMModel:
         self.data = historical_data
         self.model = None
         self.trace = None
-        self.mu_mean = .01
+        self.mu_mean = .1
         self.mu_std = .1
         self.sigma_scale = .1
         
@@ -42,9 +42,9 @@ class GBMModel:
             
             # MCMC sampling
             self.trace = pm.sample(
-                1000,               # reduce total samples
-                tune=500,           # reduce tuning steps
-                target_accept=0.8,  # lower target acceptance
+                2000,               # reduce total samples
+                tune=1000,           # reduce tuning steps
+                target_accept=0.9,  # lower target acceptance
                 chains=4,           # fewer chains
                 cores=4             # parallelize on 4 cores
             )

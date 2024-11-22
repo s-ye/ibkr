@@ -1,11 +1,12 @@
 from backtester import Backtester
 
-stock = 'MRNA'
+stock = 'WMT'
 
     # Example usage
 if __name__ == "__main__":
+    # .2, 30, 150, .02, .02
     gbm_params = {
-        'threshold': [0.1,.2],
+        'threshold': [.2,.3,.4],
         'time_periods': [30],
         'num_simulations': [150],
         'take_profit_pct': [0.01,0.02],
@@ -17,7 +18,7 @@ if __name__ == "__main__":
 
     # Run backtests with sampled periods and parameter grids
     results_df, average_results = backtester.run_sampled_backtests(
-        num_samples=30, duration_days=30, gbm_params=gbm_params
+        num_samples=15, duration_days=30, gbm_params=gbm_params
     )
 
 

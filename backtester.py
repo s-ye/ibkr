@@ -15,41 +15,15 @@ class Backtester:
     def __init__(self, stock_symbol, exchange, currency):
         self.ib = None
         self.stock = Stock(stock_symbol, exchange, currency)
-        self.full_data = self._get_full_historical_data(stock_symbol, exchange, currency)
         # Ensure cache directory exists
         if not os.path.exists('cache'):
             os.makedirs('cache')
-        self.data = self._get_historical_data(stock_symbol, exchange, currency)
-
-
-    def _get_full_historical_data(self, stock_symbol, exchange, currency):
-        cache_file = f"cache/{stock_symbol}_2year_15min_data.csv"
-        if os.path.exists(cache_file):
-            print("Loading full historical data from cache...")
-            return pd.read_csv(cache_file, index_col='date', parse_dates=True)
-        
-        print("Fetching 2 Y of historical 15-minute data from IBKR...")
-        self.ib = IB()
-        self.ib.connect('127.0.0.1', 7497, clientId=1)
-        self.ib.qualifyContracts(self.stock)
-        bars = self.ib.reqHistoricalData(
-            self.stock,
-            endDateTime='',
-            durationStr='2 Y',
-            barSizeSetting='15 mins',
-            whatToShow='TRADES',
-            useRTH=True
-        )
-        df = util.df(bars)
-        df.set_index('date', inplace=True)
-        # Ensure cache directory exists
-        if not os.path.exists('cache'):
-            os.makedirs('cache')
-        df.to_csv(cache_file)
-        self.ib.disconnect()
-        return df
-        
-
+        self.data_retrieve = Data_Retrieve()
+        self.two_yr_15min_data = self.data_retrieve._get_2yr_15min_data(self.stock)
+        self.one_mo_15min_data = self.data_retrieve._get_1mo_15min_data(self.stock)
+        self.five_yr_1d_data = self.data_retrieve._get_5yr_1d_data(self.stock)
+        self.one_yr_1d_data = self.five_yr_1d_data[-252:]
+    
     def run_sampled_backtests(self, num_samples=100, duration_days=30,gbm_params=None):
         results = []
         for _ in range(num_samples):
@@ -63,7 +37,8 @@ class Backtester:
                         gbm_params['stop_loss_pct']
                     ):
                     gbm_strategy = GBMStrategy(
-                        self.stock, sample_data, self.ib,
+                        self.stock, sample_data, self.two_yr_15min_data,
+                        self.ib,
                         params={'threshold': threshold, 'time_periods': time_periods, 'num_simulations': num_simulations},
                         initial_capital=1_000_000,
                         profit_target_pct=take_profit_pct,
@@ -109,7 +84,7 @@ class Backtester:
 
     def _get_random_sample(self, duration_days):
         """Get a random 1-month (or custom duration) sample from the 2-year dataset."""
-        total_bars = len(self.full_data)
+        total_bars = len(self.two_yr_15min_data)
         # bars_per_day based on 930am-4pm trading hours
         bars_per_day = 26
         sample_size = bars_per_day * duration_days
@@ -118,39 +93,10 @@ class Backtester:
         if sample_size > total_bars:
             raise ValueError("Sample size is larger than the total available data.")
         start_idx = random.randint(0, total_bars - sample_size)
-        sample_data = self.full_data.iloc[start_idx:start_idx + sample_size].copy()
+        sample_data = self.two_yr_15min_data.iloc[start_idx:start_idx + sample_size].copy()
         
         return sample_data
 
-    def disconnect(self):
-        self.ib.disconnect()
-
-    def _get_historical_data(self, stock_symbol, exchange, currency):
-
-        cache_file = f"cache/{stock_symbol}_1month_15min_data.csv"
-        if os.path.exists(cache_file):
-            print("Loading historical data from cache...")
-            return pd.read_csv(cache_file, index_col='date', parse_dates=True)
-        
-        print("Fetching 1 M of historical 15-minute data from IBKR...")
-        self.ib = IB()
-        self.ib.connect('127.0.0.1', 7497, clientId=1)
-        self.stock = Stock(stock_symbol, exchange, currency)
-        self.ib.qualifyContracts(self.stock)
-        bars = self.ib.reqHistoricalData(
-            self.stock,
-            endDateTime='',
-            durationStr='1 M',
-            barSizeSetting='15 mins',
-            whatToShow='TRADES',
-            useRTH=True
-        )
-        df = util.df(bars)
-        df.to_csv(cache_file)
-        # index by date
-        df.set_index('date', inplace=True)
-        self.ib.disconnect()
-        return df
 
     def run_gbm_strategy(self, gbm_params):
         for threshold, time_periods, num_simulations, take_profit_pct, stop_loss_pct in product(
@@ -166,7 +112,8 @@ class Backtester:
 
             # Instantiate a new strategy instance
             gbm_strategy = GBMStrategy(
-                self.stock, self.data, self.ib,
+                self.stock, self.one_mo_15min_data, self.two_yr_15min_data,
+                self.ib,
                 params={'threshold': threshold, 'time_periods': time_periods, 'num_simulations': num_simulations},
                 initial_capital=1_000_000,
                 profit_target_pct=take_profit_pct,
@@ -177,3 +124,112 @@ class Backtester:
             gbm_strategy.backtest()
             stats = gbm_strategy.trade_statistics()
             gbm_strategy.plot_trades()
+
+    def forecast_15_mins(self,gbm_params):
+        gbm_strategy = GBMStrategy(
+            self.stock, self.one_mo_15min_data, self.two_yr_15min_data,
+            self.ib,
+            params={'threshold': gbm_params['threshold'], 'time_periods': gbm_params['time_periods'], 'num_simulations': gbm_params['num_simulations']},
+            initial_capital=1_000_000,
+            profit_target_pct=0.02,
+            trailing_stop_pct=0.02
+        )
+        gbm_strategy.forecast()
+
+    def forecast_1_day(self,gbm_params):
+        gbmd_strategy = GBMStrategy(
+            self.stock, self.one_yr_1d_data, None,
+            self.ib,
+            params={'threshold': gbm_params['threshold'], 'time_periods': gbm_params['time_periods'], 'num_simulations': gbm_params['num_simulations']},
+            initial_capital=1_000_000,
+            profit_target_pct=0.02,
+            trailing_stop_pct=0.02
+        )
+        gbmd_strategy.forecast()
+
+
+class Data_Retrieve:
+    def __init__(self):
+        self.ib = IB()
+
+
+    def _get_2yr_15min_data(self,stock):
+        cache_file = f"cache/{stock.symbol}_2year_15min_data.csv"
+        if os.path.exists(cache_file):
+            print("Loading historical data from cache...")
+            return pd.read_csv(cache_file, index_col='date', parse_dates=True)
+        
+        print("Fetching 2 Y of historical 15-minute data from IBKR...")
+        self.ib = IB()
+        self.ib.connect('127.0.0.1', 7497, clientId=1)
+        self.stock = stock
+        self.ib.qualifyContracts(self.stock)
+        bars = self.ib.reqHistoricalData(
+            self.stock,
+            endDateTime='',
+            durationStr='2 Y',
+            barSizeSetting='15 mins',
+            whatToShow='TRADES',
+            useRTH=True
+        )
+        df = util.df(bars)
+        df.set_index('date', inplace=True)
+        # Ensure cache directory exists
+        if not os.path.exists('cache'):
+            os.makedirs('cache')
+        df.to_csv(cache_file)
+        self.ib.disconnect()
+        return df
+    
+    def _get_1mo_15min_data(self, stock):
+
+        cache_file = f"cache/{stock.symbol}_1month_15min_data.csv"
+        if os.path.exists(cache_file):
+            print("Loading historical data from cache...")
+            return pd.read_csv(cache_file, index_col='date', parse_dates=True)
+        
+        print("Fetching 1 M of historical 15-minute data from IBKR...")
+        self.ib = IB()
+        self.ib.connect('127.0.0.1', 7497, clientId=1)
+        self.stock = stock
+        self.ib.qualifyContracts(self.stock)
+        bars = self.ib.reqHistoricalData(
+            self.stock,
+            endDateTime='',
+            durationStr='1 M',
+            barSizeSetting='15 mins',
+            whatToShow='TRADES',
+            useRTH=True
+        )
+        df = util.df(bars)
+        df.to_csv(cache_file)
+        # index by date
+        df.set_index('date', inplace=True)
+        self.ib.disconnect()
+        return df
+    
+    def _get_5yr_1d_data(self, stock):
+        cache_file = f"cache/{stock.symbol}_5year_1day_data.csv"
+        if os.path.exists(cache_file):
+            print("Loading historical data from cache...")
+            return pd.read_csv(cache_file, index_col='date', parse_dates=True)
+        
+        print("Fetching 5 Y of historical daily data from IBKR...")
+        self.ib = IB()
+        self.ib.connect('127.0.0.1', 7497, clientId=1)
+        self.stock = stock
+        self.ib.qualifyContracts(self.stock)
+        bars = self.ib.reqHistoricalData(
+            self.stock,
+            endDateTime='',
+            durationStr='5 Y',
+            barSizeSetting='1 day',
+            whatToShow='TRADES',
+            useRTH=True
+        )
+        df = util.df(bars)
+        df.to_csv(cache_file)
+        # index by date
+        df.set_index('date', inplace=True)
+        self.ib.disconnect()
+        return df
