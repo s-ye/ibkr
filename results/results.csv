@@ -1,0 +1,2 @@
+,strategy,params,start_date,end_date,final_portfolio_value,total_trades,winning_trades,losing_trades,average_return,sharpe_ratio
+0,Geometric_Brownian_Motion,"{'threshold': 0.1, 'time_periods': 30, 'num_simulations': 150, 'take_profit_pct': 0.01, 'stop_loss_pct': 0.02}",2023-06-06 14:15:00-04:00,2023-07-21 10:30:00-04:00,975586.9100000008,54,40,14,0.00029521785827649335,8.011039553873312
