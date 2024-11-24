@@ -5,11 +5,11 @@ stock = 'MRNA'
     # Example usage
 if __name__ == "__main__":
     gbm_params = {
-        'threshold': [0.1],
-        'time_periods': [30],
-        'num_simulations': [150],
+        'threshold': [1,1.5,2],
+        'time_periods': [15],
+        'num_simulations': [100],
         'take_profit_pct': [0.01],
-        'stop_loss_pct': [0.02]
+        'stop_loss_pct': [0.01]
     }
 
     backtester = Backtester(stock, 'SMART', 'USD')
@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     # Run backtests with sampled periods and parameter grids
     results_df, average_results = backtester.run_sampled_backtests(
-        num_samples=1, duration_days=30, gbm_params=gbm_params
+        num_samples=15, duration_days=45, gbm_params=gbm_params
     )
 
 

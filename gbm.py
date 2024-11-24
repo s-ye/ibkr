@@ -18,16 +18,25 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 import itertools
+from math import sqrt
 
 class GBMModel:
-    def __init__(self, historical_data):
-        self.data = historical_data
+    def __init__(self, data):
+        self.data = data
         self.model = None
         self.trace = None
-        self.mu_mean = .01
-        self.mu_std = .1
-        self.sigma_scale = .1
-        
+        # the priors should be carefully chosen and adjusted for the stock 
+        # and the time period that we are working with. Therefore, we will
+        # make them equal to the mean of the log returns and the standard deviation
+        # of the log returns respectively.
+        log_returns = np.log(data['close']).diff().dropna()
+
+        self.mu_mean = np.mean(log_returns)  # Mean of log returns (drift)
+        self.sigma = np.std(log_returns, ddof=1)  # Std of log returns (volatility)
+
+        n = len(log_returns)  # Number of log returns
+        self.mu_std = self.sigma / np.sqrt(n)  # Standard error of the drift
+
 
     def fit(self):
         returns = np.log(self.data['close']).diff().dropna()
@@ -35,7 +44,7 @@ class GBMModel:
         with pm.Model() as self.model:
             # Priors for mu and sigma
             mu = pm.Normal('mu', mu=self.mu_mean, sigma=self.mu_std)
-            sigma = pm.HalfNormal('sigma', sigma=self.sigma_scale)
+            sigma = pm.HalfNormal('sigma', sigma=self.sigma)
             
             # Likelihood of observed returns
             likelihood = pm.Normal('returns', mu=mu, sigma=sigma, observed=returns)

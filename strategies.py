@@ -25,6 +25,7 @@ class GBMStrategy(StopLossTakeProfitStrategy):
         Generate buy/sell signals based on forecasted price distributions from GBM, fitting every 'self.time_periods' periods.
         """
         self.data['signal'] = 0  # Reset signals
+        self.data['normalized_volume'] = self.data['volume'] / self.data['volume'].rolling(30).mean()  # Normalize volume
         num_periods = len(self.data)
         predictions = {}  # Dictionary to store predictions for each time_periods block
         min_data_points = self.time_periods  # Minimum data points required to fit the model
