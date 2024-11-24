@@ -1,2 +1,0 @@
-Start Date,Rank,Strategy Name,Parameters,Final Portfolio Value
-2024-09-16 15:45:00-04:00,1,Geometric_Brownian_Motion,"{'threshold': 0.5, 'time_periods': 100, 'num_simulations': 150, 'take_profit_pct': 0.01, 'stop_loss_pct': 0.01}",981548.45

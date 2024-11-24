@@ -94,7 +94,7 @@ if __name__ == '__main__':
     connect_ib()
     
     # Initialize the stock and fetch historical data
-    stock_symbol = 'WMT'
+    stock_symbol = 'AAPL'
     stock = Stock(stock_symbol, 'SMART', 'USD')
     ib.qualifyContracts(stock)
     

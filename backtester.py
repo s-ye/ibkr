@@ -23,7 +23,36 @@ class Backtester:
         self.one_mo_15min_data = self.data_retrieve._get_1mo_15min_data(self.stock)
         self.five_yr_1d_data = self.data_retrieve._get_5yr_1d_data(self.stock)
         self.one_yr_1d_data = self.five_yr_1d_data[-252:]
-    
+
+
+    def _get_full_historical_data(self, stock_symbol, exchange, currency):
+        cache_file = f"cache/{stock_symbol}_2year_15min_data.csv"
+        if os.path.exists(cache_file):
+            print("Loading full historical data from cache...")
+            return pd.read_csv(cache_file, index_col='date', parse_dates=True)
+        
+        print("Fetching 2 Y of historical 15-minute data from IBKR...")
+        self.ib = IB()
+        self.ib.connect('127.0.0.1', 7497, clientId=1)
+        self.ib.qualifyContracts(self.stock)
+        bars = self.ib.reqHistoricalData(
+            self.stock,
+            endDateTime='',
+            durationStr='2 Y',
+            barSizeSetting='15 mins',
+            whatToShow='TRADES',
+            useRTH=True
+        )
+        df = util.df(bars)
+        df.set_index('date', inplace=True)
+        # Ensure cache directory exists
+        if not os.path.exists('cache'):
+            os.makedirs('cache')
+        df.to_csv(cache_file)
+        self.ib.disconnect()
+        return df
+        
+
     def run_sampled_backtests(self, num_samples=100, duration_days=30,gbm_params=None):
         results = []
         for _ in range(num_samples):
@@ -37,8 +66,7 @@ class Backtester:
                         gbm_params['stop_loss_pct']
                     ):
                     gbm_strategy = GBMStrategy(
-                        self.stock, sample_data, self.two_yr_15min_data,
-                        self.ib,
+                        self.stock, sample_data, self.ib,
                         params={'threshold': threshold, 'time_periods': time_periods, 'num_simulations': num_simulations},
                         initial_capital=1_000_000,
                         profit_target_pct=take_profit_pct,
@@ -112,8 +140,7 @@ class Backtester:
 
             # Instantiate a new strategy instance
             gbm_strategy = GBMStrategy(
-                self.stock, self.one_mo_15min_data, self.two_yr_15min_data,
-                self.ib,
+                self.stock, self.one_mo_15min_data, self.ib,
                 params={'threshold': threshold, 'time_periods': time_periods, 'num_simulations': num_simulations},
                 initial_capital=1_000_000,
                 profit_target_pct=take_profit_pct,
@@ -127,7 +154,7 @@ class Backtester:
 
     def forecast_15_mins(self,gbm_params):
         gbm_strategy = GBMStrategy(
-            self.stock, self.one_mo_15min_data, self.two_yr_15min_data,
+            self.stock, self.one_mo_15min_data,
             self.ib,
             params={'threshold': gbm_params['threshold'], 'time_periods': gbm_params['time_periods'], 'num_simulations': gbm_params['num_simulations']},
             initial_capital=1_000_000,
@@ -138,15 +165,13 @@ class Backtester:
 
     def forecast_1_day(self,gbm_params):
         gbmd_strategy = GBMStrategy(
-            self.stock, self.one_yr_1d_data, None,
-            self.ib,
+            self.stock, self.one_yr_1d_data, self.ib,
             params={'threshold': gbm_params['threshold'], 'time_periods': gbm_params['time_periods'], 'num_simulations': gbm_params['num_simulations']},
             initial_capital=1_000_000,
             profit_target_pct=0.02,
             trailing_stop_pct=0.02
         )
         gbmd_strategy.forecast()
-
 
 class Data_Retrieve:
     def __init__(self):
@@ -233,3 +258,4 @@ class Data_Retrieve:
         df.set_index('date', inplace=True)
         self.ib.disconnect()
         return df
+

@@ -12,8 +12,8 @@ else
   mkdir "$OUTPUT_DIR"
 fi
 
-# clear the cache as well
-OUTPUT_DIR="cache"
+
+OUTPUT_DIR="results"
 
 # Check if the output directory exists
 if [ -d "$OUTPUT_DIR" ]; then
@@ -24,7 +24,5 @@ else
   mkdir "$OUTPUT_DIR"
 fi
 
-
-# Run main.py
 echo "Running mass_testing.py..."
 caffeinate -i python3 mass_testing.py
