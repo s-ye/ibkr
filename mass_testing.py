@@ -5,11 +5,11 @@ stock = 'MRNA'
     # Example usage
 if __name__ == "__main__":
     gbm_params = {
-        'threshold': [1,1.5,2],
+        'threshold': [1.5,1.75, 2],
         'time_periods': [15],
         'num_simulations': [100],
-        'take_profit_pct': [0.01],
-        'stop_loss_pct': [0.01]
+        'take_profit_pct': [0.01,0.02],
+        'stop_loss_pct': [0.01,0.02]
     }
 
     backtester = Backtester(stock, 'SMART', 'USD')
