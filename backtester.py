@@ -21,9 +21,11 @@ class Backtester:
         self.data_retrieve = Data_Retrieve()
         self.two_yr_15min_data = self.data_retrieve._get_2yr_15min_data(self.stock)
         self.one_mo_15min_data = self.data_retrieve._get_1mo_15min_data(self.stock)
-        self.five_yr_1d_data = self.data_retrieve._get_5yr_1d_data(self.stock)
-        self.one_yr_1d_data = self.five_yr_1d_data[-252:]
 
+        self.five_yr_1d_data = self.data_retrieve._get_5yr_1d_data(self.stock)
+        self.one_yr_1d_data = self.five_yr_1d_data[-252:].copy()
+        self.six_mo_1d_data = self.five_yr_1d_data[-126:].copy()
+        self.three_mo_1d_data = self.five_yr_1d_data[-63:].copy()
 
     def _get_full_historical_data(self, stock_symbol, exchange, currency):
         cache_file = f"cache/{stock_symbol}_2year_15min_data.csv"
@@ -163,9 +165,29 @@ class Backtester:
         )
         gbm_strategy.forecast()
 
-    def forecast_1_day(self,gbm_params):
+    def forecast_1_day_1yr(self,gbm_params):
         gbmd_strategy = GBMStrategy(
             self.stock, self.one_yr_1d_data, self.ib,
+            params={'threshold': gbm_params['threshold'], 'time_periods': gbm_params['time_periods'], 'num_simulations': gbm_params['num_simulations']},
+            initial_capital=1_000_000,
+            profit_target_pct=0.02,
+            trailing_stop_pct=0.02
+        )
+        gbmd_strategy.forecast()
+
+    def forecast_1_day_6m(self,gbm_params):
+        gbmd_strategy = GBMStrategy(
+            self.stock, self.six_mo_1d_data, self.ib,
+            params={'threshold': gbm_params['threshold'], 'time_periods': gbm_params['time_periods'], 'num_simulations': gbm_params['num_simulations']},
+            initial_capital=1_000_000,
+            profit_target_pct=0.02,
+            trailing_stop_pct=0.02
+        )
+        gbmd_strategy.forecast()
+
+    def forecast_1_day_3m(self,gbm_params):
+        gbmd_strategy = GBMStrategy(
+            self.stock, self.three_mo_1d_data, self.ib,
             params={'threshold': gbm_params['threshold'], 'time_periods': gbm_params['time_periods'], 'num_simulations': gbm_params['num_simulations']},
             initial_capital=1_000_000,
             profit_target_pct=0.02,

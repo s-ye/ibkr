@@ -57,7 +57,8 @@ class GBMModel:
                 chains=4,           # fewer chains
                 cores=4             # parallelize on 4 cores
             )
-    def simulate_future_prices(self, start_price, time_periods, num_simulations=100):
+
+    def simulate_future_prices(self, start_price, freq, time_periods, num_simulations=100):
         simulations = np.zeros((num_simulations, time_periods))
         
         for i in range(num_simulations):
@@ -66,8 +67,13 @@ class GBMModel:
             prices = [start_price]
             
             for t in range(1, time_periods):
-                # 26 bars in a day
-                dt = 1/26 
+                if freq == 'B':
+                    # days
+                    dt = 1
+                if freq == '15T':
+                    # 15 minutes
+                    dt = 1/26
+
 
                 next_price = prices[-1] * np.exp((mu_sample - 0.5 * sigma_sample**2) * dt +
                                                  sigma_sample * np.sqrt(dt) * np.random.normal())

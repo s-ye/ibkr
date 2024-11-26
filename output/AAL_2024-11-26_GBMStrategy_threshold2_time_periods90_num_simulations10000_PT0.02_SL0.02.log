@@ -1,0 +1,2 @@
+2024-11-26 13:34:38,263 - Starting GBMStrategy with initial capital: 1000000
+2024-11-26 13:34:38,263 - Hyperparameters: {'threshold': 2, 'time_periods': 90, 'num_simulations': 10000}
