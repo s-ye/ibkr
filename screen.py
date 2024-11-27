@@ -5,16 +5,12 @@
 from backtester import Backtester
 import numpy as np
 from scipy.stats import shapiro, kstest, norm
+import matplotlib.pyplot as plt
 
 
-stock = 'AAL'
+stock = 'TGT'
 
 if __name__ == "__main__":
-    gbm_params = {
-        'threshold': 2,
-        'time_periods': 90,
-        'num_simulations': 10000,
-    }
     backtester = Backtester(stock, 'SMART', 'USD')
     # different time frames
     datas = [
@@ -33,6 +29,14 @@ if __name__ == "__main__":
         mean, std = log_returns.mean(), log_returns.std()
         stat, p_value = kstest(log_returns, 'norm', args=(mean, std))
         print(f"K-S Test Statistic: {stat}, p-value: {p_value}")
+
+        # save histogram
+        plt.hist(log_returns, bins=50, color='blue', alpha=0.5, density=True)
+        plt.title(f"Log Returns Distribution: {name}")
+        plt.xlabel("Log Returns")
+        plt.ylabel("Density")
+        plt.savefig(f"output/{stock}_log_returns_{name}.png")
+        plt.clf()
 
 
 

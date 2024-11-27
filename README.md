@@ -39,5 +39,4 @@ This trading bot combines statistical modeling with robust risk management and p
 
 ## To-Do List
 
-- [ ] Get a seperate computer to run the bot
-- [ ] Implement volume data
+- [ ] I have a distribution which I think the log returns will be sampled from, in particular a normal distribution with mean and standard deviation which will be learned with bayesian inference. However, log returns are not just an independent sequence of numbers but the order in which they appear also has meaning. Also, the sequence of future log returns can be predicted using other things along with close price, such as bid and ask and volume. I want to use machine learning to predict the sequence of log returns, with the fact that they should be drawn from a particular distribution.

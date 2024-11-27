@@ -22,7 +22,8 @@ class Backtester:
         self.two_yr_15min_data = self.data_retrieve._get_2yr_15min_data(self.stock)
         self.one_mo_15min_data = self.data_retrieve._get_1mo_15min_data(self.stock)
 
-        self.five_yr_1d_data = self.data_retrieve._get_5yr_1d_data(self.stock)
+        self.max_1d_data = self.data_retrieve._get_max_1d_data(self.stock)
+        self.five_yr_1d_data = self.max_1d_data[-1260:].copy()
         self.one_yr_1d_data = self.five_yr_1d_data[-252:].copy()
         self.six_mo_1d_data = self.five_yr_1d_data[-126:].copy()
         self.three_mo_1d_data = self.five_yr_1d_data[-63:].copy()
@@ -254,14 +255,15 @@ class Data_Retrieve:
         df.set_index('date', inplace=True)
         self.ib.disconnect()
         return df
+
     
-    def _get_5yr_1d_data(self, stock):
-        cache_file = f"cache/{stock.symbol}_5year_1day_data.csv"
+    def _get_max_1d_data(self, stock):
+        cache_file = f"cache/{stock.symbol}_max_1day_data.csv"
         if os.path.exists(cache_file):
             print("Loading historical data from cache...")
             return pd.read_csv(cache_file, index_col='date', parse_dates=True)
         
-        print("Fetching 5 Y of historical daily data from IBKR...")
+        print("Fetching max historical daily data from IBKR...")
         self.ib = IB()
         self.ib.connect('127.0.0.1', 7497, clientId=1)
         self.stock = stock
@@ -269,7 +271,8 @@ class Data_Retrieve:
         bars = self.ib.reqHistoricalData(
             self.stock,
             endDateTime='',
-            durationStr='5 Y',
+            # Max historical data
+            durationStr='10 Y',
             barSizeSetting='1 day',
             whatToShow='TRADES',
             useRTH=True
