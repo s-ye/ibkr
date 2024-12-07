@@ -8,7 +8,7 @@ from scipy.stats import shapiro, kstest, norm
 import matplotlib.pyplot as plt
 
 
-stock = 'MAR'
+stock = 'UAL'
 
 if __name__ == "__main__":
     backtester = Backtester(stock, 'SMART', 'USD')
