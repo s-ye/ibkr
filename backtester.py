@@ -272,7 +272,7 @@ class Data_Retrieve:
             self.stock,
             endDateTime='',
             # Max historical data
-            durationStr='10 Y',
+            durationStr='15 Y',
             barSizeSetting='1 day',
             whatToShow='TRADES',
             useRTH=True
