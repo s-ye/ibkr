@@ -1,4 +1,0 @@
-strategy,params,Final Portfolio Value
-Geometric_Brownian_Motion,"{'threshold': 2, 'time_periods': 15, 'num_simulations': 100, 'take_profit_pct': 0.01, 'stop_loss_pct': 0.01}",1001903.09
-Geometric_Brownian_Motion,"{'threshold': 1.5, 'time_periods': 15, 'num_simulations': 100, 'take_profit_pct': 0.01, 'stop_loss_pct': 0.01}",1001075.91
-Geometric_Brownian_Motion,"{'threshold': 1, 'time_periods': 15, 'num_simulations': 100, 'take_profit_pct': 0.01, 'stop_loss_pct': 0.01}",1000598.45

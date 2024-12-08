@@ -30,12 +30,27 @@ class GBMModel:
         # make them equal to the mean of the log returns and the standard deviation
         # of the log returns respectively.
         log_returns = np.log(data['close']).diff().dropna()
+        # since we are working with daily data, we will assume that there are 252 trading days in a year
+        # and therefore we have
+        # Step 2: Estimate mu_mean and mu_std
+        mu_mean = np.mean(log_returns) * 252  # Annualized mean drift
+        mu_std = np.std(log_returns, ddof=1) * np.sqrt(252)  # Annualized drift variability
 
-        self.mu_mean = np.mean(log_returns)  # Mean of log returns (drift)
-        self.sigma = np.std(log_returns, ddof=1)  # Std of log returns (volatility)
+        # Step 3: Estimate sigma_mean and sigma_std
+        daily_volatility = np.std(log_returns, ddof=1)  # Daily volatility
+        sigma_mean = daily_volatility * np.sqrt(252)  # Annualized mean volatility
 
-        n = len(log_returns)  # Number of log returns
-        self.mu_std = self.sigma / np.sqrt(n)  # Standard error of the drift
+        # Step 3a: Realized volatility (rolling window example, e.g., 20 days)
+        rolling_volatility = pd.Series(log_returns).rolling(window=20).std()
+        sigma_std = rolling_volatility.std() * np.sqrt(252)  # Volatility of volatility
+
+        print(f"mu_mean: {mu_mean:.4f}, mu_std: {mu_std:.4f}")
+        print(f"sigma_mean: {sigma_mean:.4f}, sigma_std: {sigma_std:.4f}")
+        
+        self.mu_mean = mu_mean
+        self.mu_std = mu_std
+        self.sigma_mean = sigma_mean
+        self.sigma_std = sigma_std
 
 
     def fit(self):
@@ -44,7 +59,7 @@ class GBMModel:
         with pm.Model() as self.model:
             # Priors for mu and sigma
             mu = pm.Normal('mu', mu=self.mu_mean, sigma=self.mu_std)
-            sigma = pm.HalfNormal('sigma', sigma=self.sigma)
+            sigma = pm.Lognormal('sigma', mu=np.log(self.sigma_mean), sigma=self.sigma_std)
             
             # Likelihood of observed returns
             likelihood = pm.Normal('returns', mu=mu, sigma=sigma, observed=returns)
@@ -60,6 +75,8 @@ class GBMModel:
 
     def simulate_future_prices(self, start_price, freq, time_periods, num_simulations=100):
         simulations = np.zeros((num_simulations, time_periods))
+        associated_mu = np.zeros(num_simulations)
+        associated_sigma = np.zeros(num_simulations)
         
         for i in range(num_simulations):
             mu_sample = np.random.choice(self.trace.posterior['mu'].values.flatten())
@@ -73,6 +90,8 @@ class GBMModel:
                 if freq == '15T':
                     # 15 minutes
                     dt = 1/26
+                # sample from the posterior distribution of mu and sigma
+                # which means that Bayesian updating has been done given the prior
 
 
                 next_price = prices[-1] * np.exp((mu_sample - 0.5 * sigma_sample**2) * dt +
@@ -80,8 +99,10 @@ class GBMModel:
                 prices.append(next_price)
             
             simulations[i, :] = prices
+            associated_mu[i] = mu_sample
+            associated_sigma[i] = sigma_sample
         
-        return simulations
+        return simulations, associated_mu, associated_sigma
     
     def format_func(value, tick_number):
         """Format function to make numbers more readable."""

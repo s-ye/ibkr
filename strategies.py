@@ -1,5 +1,4 @@
 # strategies.py
-from base_strategy import BaseStrategy
 import pandas as pd
 import matplotlib.pyplot as plt
 from stoploss_takeprofit_strategy import StopLossTakeProfitStrategy
@@ -114,6 +113,7 @@ class GBMStrategy(StopLossTakeProfitStrategy):
         model = gbm.GBMModel(self.data)
         model.fit()
         start_price = self.data['close'].iloc[-1]
+        print(f"Start Price: {start_price}")
 
         # Generate forecast dates based on the frequency of the original data
         first_date = self.data.index[0]
@@ -137,7 +137,7 @@ class GBMStrategy(StopLossTakeProfitStrategy):
         duration_str = str(first_date.date()) + '_' + str(last_date.date()) 
 
         # Simulate future prices
-        simulations = model.simulate_future_prices(start_price, frequency,self.time_periods,  self.num_simulations)
+        simulations, associated_mu, associated_sigma = model.simulate_future_prices(start_price, frequency, self.time_periods, self.num_simulations)
         mean, std = np.mean(simulations, axis=0), np.std(simulations, axis=0)
 
         # show the distribution of the last period
@@ -150,9 +150,8 @@ class GBMStrategy(StopLossTakeProfitStrategy):
         plt.ylabel("Density")
         plt.legend(["Mean", "Mean - 2*Std", "Mean + 2*Std"])
         plt.savefig(f"output/{self.contract.symbol}_forecast_distribution_{frequency_str}_{duration_str}.png")
+        plt.show()
         plt.clf()
-
-
 
         forecast_dates = pd.bdate_range(start=last_date, periods=self.time_periods + 1, freq=frequency)[1:]
         # Plotting the mean forecast with confidence interval
@@ -167,6 +166,7 @@ class GBMStrategy(StopLossTakeProfitStrategy):
 
 
         plt.savefig(f"output/{self.contract.symbol}_forecast_{frequency_str}_{duration_str}.png")
+        plt.show()
         # clear the plot
         plt.clf()
 
@@ -176,9 +176,6 @@ class GBMStrategy(StopLossTakeProfitStrategy):
 
         # Logging forecasted prices with dates
         with open(f"output/{self.contract.symbol}_forecast_{frequency_str}_{duration_str}.txt", "w") as f:
-            f.write("Forecasted Prices (Date, Mean, and Std):\n")
-            for i, date in enumerate(forecast_dates):
-                f.write(f"{date.strftime('%Y-%m-%d %H:%M')}: Mean = {mean[i]:.2f}, Std = {std[i]:.2f}\n")
             f.write("\n95% Confidence Interval:\n")
             f.write(f"Lower Bound: {ci_lower:.2f}\n")
             f.write(f"Upper Bound: {ci_upper:.2f}\n")
@@ -191,6 +188,13 @@ class GBMStrategy(StopLossTakeProfitStrategy):
             num_lower = np.sum(simulations[:, -1] < ci_lower)
             f.write(f"\nNumber of Simulations Above Upper Bound: {num_higher}")
             f.write(f"\nNumber of Simulations Below Lower Bound: {num_lower}")
+
+        # print all the statements that were saved
+        with open(f"output/{self.contract.symbol}_forecast_{frequency_str}_{duration_str}.txt", "r") as f:
+            print(f.read())
+
+        return simulations, associated_mu, associated_sigma, forecast_dates
+            
 
         
 # introduce GBM with Volume data

@@ -164,7 +164,19 @@ class Backtester:
             profit_target_pct=0.02,
             trailing_stop_pct=0.02
         )
-        gbm_strategy.forecast()
+        simulations, forecast_dates = gbm_strategy.forecast()
+        # plot a random simulation
+
+        plt.figure(figsize=(12, 6))
+        for i in range(10):
+            plt.plot(forecast_dates, simulations[i], alpha=0.5)
+        plt.title(f"GBM Forecast for {self.stock.symbol}")
+        plt.xlabel("Date")
+        plt.ylabel("Price")
+        plt.show()
+
+
+
 
     def forecast_1_day_1yr(self,gbm_params):
         gbmd_strategy = GBMStrategy(
@@ -174,7 +186,18 @@ class Backtester:
             profit_target_pct=0.02,
             trailing_stop_pct=0.02
         )
-        gbmd_strategy.forecast()
+        simulations, forecast_dates = gbmd_strategy.forecast()
+        # plot a random simulation
+
+        plt.figure(figsize=(12, 6))
+        for i in range(10):
+            plt.plot(forecast_dates, simulations[i], alpha=0.5)
+        plt.title(f"GBM Forecast for {self.stock.symbol}")
+        plt.xlabel("Date")
+        plt.ylabel("Price")
+        plt.show()
+
+        return simulations, forecast_dates
 
     def forecast_1_day_6m(self,gbm_params):
         gbmd_strategy = GBMStrategy(
@@ -184,7 +207,18 @@ class Backtester:
             profit_target_pct=0.02,
             trailing_stop_pct=0.02
         )
-        gbmd_strategy.forecast()
+        simulations, forecast_dates = gbmd_strategy.forecast()
+        # plot a random simulation
+
+        plt.figure(figsize=(12, 6))
+        for i in range(10):
+            plt.plot(forecast_dates, simulations[i], alpha=0.5)
+        plt.title(f"GBM Forecast for {self.stock.symbol}")
+        plt.xlabel("Date")
+        plt.ylabel("Price")
+        plt.show()
+
+        return simulations, forecast_dates
 
     def forecast_1_day_3m(self,gbm_params):
         gbmd_strategy = GBMStrategy(
@@ -194,7 +228,42 @@ class Backtester:
             profit_target_pct=0.02,
             trailing_stop_pct=0.02
         )
-        gbmd_strategy.forecast()
+        simulations, forecast_dates = gbmd_strategy.forecast()
+        # plot a random simulation
+
+        plt.figure(figsize=(12, 6))
+        for i in range(10):
+            plt.plot(forecast_dates, simulations[i], alpha=0.5)
+        plt.title(f"GBM Forecast for {self.stock.symbol}")
+        plt.xlabel("Date")
+        plt.ylabel("Price")
+        plt.show()
+
+        return simulations, forecast_dates
+    
+    def forecast_data(self,gbm_params,data):
+        gbm_strategy = GBMStrategy(
+            self.stock, data, self.ib,
+            params={'threshold': gbm_params['threshold'], 'time_periods': gbm_params['time_periods'], 'num_simulations': gbm_params['num_simulations']},
+            initial_capital=1_000_000,
+            profit_target_pct=0.02,
+            trailing_stop_pct=0.02
+        )
+        simulations, associated_mu, associated_sigma, forecast_dates = gbm_strategy.forecast()  
+        # plot a random simulation
+
+        plt.figure(figsize=(12, 6))
+        for i in range(10):
+            plt.plot(forecast_dates, simulations[i], alpha=0.5)
+            # label each simulation with its associated mu and sigma
+            plt.text(forecast_dates[-1], simulations[i][-1], f"μ={associated_mu[i]:.2f}, σ={associated_sigma[i]:.2f}")
+        plt.title(f"GBM Forecast for {self.stock.symbol}")
+        plt.xlabel("Date")
+        plt.ylabel("Price")
+        plt.show()
+
+        return simulations, associated_mu, associated_sigma, forecast_dates
+
 
 class Data_Retrieve:
     def __init__(self):
