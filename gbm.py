@@ -73,7 +73,7 @@ class GBMModel:
                 cores=4             # parallelize on 4 cores
             )
 
-    def simulate_future_prices(self, start_price, freq, time_periods, num_simulations=100):
+    def simulate_future_prices(self, start_price, time_periods, num_simulations=100):
         simulations = np.zeros((num_simulations, time_periods))
         associated_mu = np.zeros(num_simulations)
         associated_sigma = np.zeros(num_simulations)
@@ -84,16 +84,9 @@ class GBMModel:
             prices = [start_price]
             
             for t in range(1, time_periods):
-                if freq == 'B':
-                    # days
-                    dt = 1
-                if freq == '15T':
-                    # 15 minutes
-                    dt = 1/26
+                dt = 1
                 # sample from the posterior distribution of mu and sigma
                 # which means that Bayesian updating has been done given the prior
-
-
                 next_price = prices[-1] * np.exp((mu_sample - 0.5 * sigma_sample**2) * dt +
                                                  sigma_sample * np.sqrt(dt) * np.random.normal())
                 prices.append(next_price)

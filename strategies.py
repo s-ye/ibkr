@@ -118,26 +118,12 @@ class GBMStrategy(StopLossTakeProfitStrategy):
         # Generate forecast dates based on the frequency of the original data
         first_date = self.data.index[0]
         last_date = self.data.index[-1]
-        frequency = self.data.index[-1] - self.data.index[-2]
-
-        # if the frequency is a trading day, use bdate_range to exclude weekends
-        if frequency == pd.Timedelta('1 days'):
-            frequency = 'B'
-        else:
-            frequency = '15T'  # 15 minutes
-
-        # timedelta to string
-        frequency_str = str(frequency)
-        # replace '0 days' with ''
-        frequency_str = frequency_str.replace('0 days ', '')
-        # replace '00:00:00' with ''
-        frequency_str = frequency_str.replace('00:00:00', '')
 
         # durationstr
         duration_str = str(first_date.date()) + '_' + str(last_date.date()) 
 
         # Simulate future prices
-        simulations, associated_mu, associated_sigma = model.simulate_future_prices(start_price, frequency, self.time_periods, self.num_simulations)
+        simulations, associated_mu, associated_sigma = model.simulate_future_prices(start_price, self.time_periods, self.num_simulations)
         mean, std = np.mean(simulations, axis=0), np.std(simulations, axis=0)
 
         # show the distribution of the last period
@@ -149,11 +135,11 @@ class GBMStrategy(StopLossTakeProfitStrategy):
         plt.xlabel("Price")
         plt.ylabel("Density")
         plt.legend(["Mean", "Mean - 2*Std", "Mean + 2*Std"])
-        plt.savefig(f"output/{self.contract.symbol}_forecast_distribution_{frequency_str}_{duration_str}.png")
+        plt.savefig(f"output/{self.contract.symbol}_forecast_distribution_{duration_str}.png")
         plt.show()
         plt.clf()
 
-        forecast_dates = pd.bdate_range(start=last_date, periods=self.time_periods + 1, freq=frequency)[1:]
+        forecast_dates = pd.bdate_range(start=last_date, periods=self.time_periods + 1)[1:]
         # Plotting the mean forecast with confidence interval
         plt.plot(forecast_dates, mean, color='blue', label='Mean Forecast')
         plt.fill_between(forecast_dates, mean - 2 * std, mean + 2 * std, color='gray', alpha=0.2)
@@ -165,7 +151,7 @@ class GBMStrategy(StopLossTakeProfitStrategy):
         plt.legend()
 
 
-        plt.savefig(f"output/{self.contract.symbol}_forecast_{frequency_str}_{duration_str}.png")
+        plt.savefig(f"output/{self.contract.symbol}_forecast_{duration_str}.png")
         plt.show()
         # clear the plot
         plt.clf()
@@ -175,7 +161,7 @@ class GBMStrategy(StopLossTakeProfitStrategy):
         ci_upper = mean[-1] + 2 * std[-1]
 
         # Logging forecasted prices with dates
-        with open(f"output/{self.contract.symbol}_forecast_{frequency_str}_{duration_str}.txt", "w") as f:
+        with open(f"output/{self.contract.symbol}_forecast_{duration_str}.txt", "w") as f:
             f.write("\n95% Confidence Interval:\n")
             f.write(f"Lower Bound: {ci_lower:.2f}\n")
             f.write(f"Upper Bound: {ci_upper:.2f}\n")
@@ -190,7 +176,7 @@ class GBMStrategy(StopLossTakeProfitStrategy):
             f.write(f"\nNumber of Simulations Below Lower Bound: {num_lower}")
 
         # print all the statements that were saved
-        with open(f"output/{self.contract.symbol}_forecast_{frequency_str}_{duration_str}.txt", "r") as f:
+        with open(f"output/{self.contract.symbol}_forecast_{duration_str}.txt", "r") as f:
             print(f.read())
 
         return simulations, associated_mu, associated_sigma, forecast_dates
