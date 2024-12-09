@@ -1,8 +1,8 @@
 
 95% Confidence Interval:
-Lower Bound: -2.60
-Upper Bound: 104.63
+Lower Bound: -1.80
+Upper Bound: 99.99
 
-Coverage Probability: 0.95
-Number of Simulations Above Upper Bound: 47
+Coverage Probability: 0.96
+Number of Simulations Above Upper Bound: 43
 Number of Simulations Below Lower Bound: 0

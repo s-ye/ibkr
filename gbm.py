@@ -59,10 +59,10 @@ class GBMModel:
         with pm.Model() as self.model:
             # Priors for mu and sigma
             mu = pm.Normal('mu', mu=self.mu_mean, sigma=self.mu_std)
-            sigma = pm.Lognormal('sigma', mu=np.log(self.sigma_mean), sigma=self.sigma_std)
+            sigma = pm.Normal('sigma', mu=self.sigma_mean, sigma=self.sigma_std)
             
             # Likelihood of observed returns
-            likelihood = pm.Normal('returns', mu=mu, sigma=sigma, observed=returns)
+            likelihood = pm.Normal('returns', mu=mu  - 0.5 * sigma**2, sigma=sigma, observed=returns)
             
             # MCMC sampling
             self.trace = pm.sample(
