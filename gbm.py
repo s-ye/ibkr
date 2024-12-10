@@ -29,40 +29,33 @@ class GBMModel:
         # and the time period that we are working with. Therefore, we will
         # make them equal to the mean of the log returns and the standard deviation
         # of the log returns respectively.
-        log_returns = np.log(data['close']).diff().dropna()
-        # since we are working with daily data, we will assume that there are 252 trading days in a year
-        # and therefore we have
-        # Step 2: Estimate mu_mean and mu_std
-        mu_mean = np.mean(log_returns) * 252  # Annualized mean drift
-        mu_std = np.std(log_returns, ddof=1) * np.sqrt(252)  # Annualized drift variability
+        self.log_returns = np.log(data['close']).diff().dropna()
+        # mu = (r-hat + 0.5 * sigma^2)/dt
+        # sigma = sqrt(sigma-hat^2/dt)
+        self.dt = 1/252
+        r_hat = np.mean(self.log_returns)
+        sigma_hat = np.std(self.log_returns)
+        # annuallized
+        self.mu = r_hat/self.dt + 0.5 * sigma_hat**2
+        self.sigma = sqrt(sigma_hat**2/self.dt)
+        # print all these numbers
+        print(f"r-hat: {r_hat}, sigma-hat: {sigma_hat}")
+        print(f"mu: {self.mu}, sigma: {self.sigma}")
 
-        # Step 3: Estimate sigma_mean and sigma_std
-        daily_volatility = np.std(log_returns, ddof=1)  # Daily volatility
-        sigma_mean = daily_volatility * np.sqrt(252)  # Annualized mean volatility
-
-        # Step 3a: Realized volatility (rolling window example, e.g., 20 days)
-        rolling_volatility = pd.Series(log_returns).rolling(window=20).std()
-        sigma_std = rolling_volatility.std() * np.sqrt(252)  # Volatility of volatility
-
-        print(f"mu_mean: {mu_mean:.4f}, mu_std: {mu_std:.4f}")
-        print(f"sigma_mean: {sigma_mean:.4f}, sigma_std: {sigma_std:.4f}")
-        
-        self.mu_mean = mu_mean
-        self.mu_std = mu_std
-        self.sigma_mean = sigma_mean
-        self.sigma_std = sigma_std
 
 
     def fit(self):
-        returns = np.log(self.data['close']).diff().dropna()
-        
+        # this could be learned during validation
+        threshold = 0.1
         with pm.Model() as self.model:
             # Priors for mu and sigma
-            mu = pm.Normal('mu', mu=self.mu_mean, sigma=self.mu_std)
-            sigma = pm.Normal('sigma', mu=self.sigma_mean, sigma=self.sigma_std)
+            mu = pm.Normal('mu', mu=self.mu, sigma=self.sigma * threshold)
+            sigma_scale = np.sqrt(np.pi / 2) * self.sigma
+
+            sigma = pm.HalfNormal('sigma', sigma=sigma_scale)
             
             # Likelihood of observed returns
-            likelihood = pm.Normal('returns', mu=mu  - 0.5 * sigma**2, sigma=sigma, observed=returns)
+            likelihood = pm.Normal('returns', mu = mu - 0.5 * sigma**2, sigma=sigma, observed=self.log_returns)
             
             # MCMC sampling
             self.trace = pm.sample(
@@ -79,16 +72,17 @@ class GBMModel:
         associated_sigma = np.zeros(num_simulations)
         
         for i in range(num_simulations):
+            # we have learned a probability distribution for mu, sigma given the prior
+            # now we sample from this data
             mu_sample = np.random.choice(self.trace.posterior['mu'].values.flatten())
             sigma_sample = np.random.choice(self.trace.posterior['sigma'].values.flatten())
             prices = [start_price]
             
             for t in range(1, time_periods):
-                dt = 1
                 # sample from the posterior distribution of mu and sigma
                 # which means that Bayesian updating has been done given the prior
-                next_price = prices[-1] * np.exp((mu_sample - 0.5 * sigma_sample**2) * dt +
-                                                 sigma_sample * np.sqrt(dt) * np.random.normal())
+                next_price = prices[-1] * np.exp((mu_sample - 0.5 * sigma_sample**2) * self.dt +
+                                                 sigma_sample * np.sqrt(self.dt) * np.random.normal())
                 prices.append(next_price)
             
             simulations[i, :] = prices
