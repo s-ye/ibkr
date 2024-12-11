@@ -33,14 +33,14 @@ class GBMModel:
         # mu = (r-hat + 0.5 * sigma^2)/dt
         # sigma = sqrt(sigma-hat^2/dt)
         self.dt = 1/252
-        r_hat = np.mean(self.log_returns)
-        sigma_hat = np.std(self.log_returns)
-        # annuallized
-        self.mu = r_hat/self.dt + 0.5 * sigma_hat**2
-        self.sigma = sqrt(sigma_hat**2/self.dt)
+        self.r_hat = np.mean(self.log_returns)
+        self.sigma_hat = np.std(self.log_returns)
+        self.annualized_return = self.r_hat / self.dt
+        self.annualized_volatility = self.sigma_hat / sqrt(self.dt)
         # print all these numbers
-        print(f"r-hat: {r_hat}, sigma-hat: {sigma_hat}")
-        print(f"mu: {self.mu}, sigma: {self.sigma}")
+        print(f"r-hat: {self.r_hat}, sigma-hat: {self.sigma_hat}")
+        print(f"Annualized return: {self.annualized_return}, Annualized volatility: {self.annualized_volatility}")
+
 
 
 
@@ -49,13 +49,12 @@ class GBMModel:
         threshold = 0.1
         with pm.Model() as self.model:
             # Priors for mu and sigma
-            mu = pm.Normal('mu', mu=self.mu, sigma=self.sigma * threshold)
-            sigma_scale = np.sqrt(np.pi / 2) * self.sigma
-
+            mu = pm.Normal('mu', mu = (self.annualized_return - 0.5 * self.annualized_volatility**2) * self.dt, sigma=self.annualized_volatility * np.sqrt(self.dt))
+            sigma_scale = self.annualized_volatility * np.sqrt(self.dt) * np.sqrt(np.pi / 2)
             sigma = pm.HalfNormal('sigma', sigma=sigma_scale)
             
             # Likelihood of observed returns
-            likelihood = pm.Normal('returns', mu = mu - 0.5 * sigma**2, sigma=sigma, observed=self.log_returns)
+            likelihood = pm.Normal('returns', mu = self.dt * (mu - 0.5 * sigma**2), sigma=np.sqrt(self.dt) * sigma, observed=self.log_returns)
             
             # MCMC sampling
             self.trace = pm.sample(
